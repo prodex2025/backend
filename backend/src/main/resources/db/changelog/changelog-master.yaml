@@ -1,0 +1,4 @@
+databaseChangeLog:
+  - include:
+      file: db/changeLog/V1__users_create_table.yaml
+
