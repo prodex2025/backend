@@ -1,0 +1,33 @@
+databaseChangeLog:
+    - changeSet:
+          id: V1.2__refresh_token_table
+          author: okisima
+          preConditions:
+              - sqlCheck:
+                    expectedResult: 1
+                    sql: "SELECT 1 FROM pg_available_extensions WHERE name = 'uuid-ossp'"
+                    changes:
+              - createTable:
+                    tableName: refresh_token
+                    columns:
+                        - column:
+                              name: id
+                              type: UUID
+                              defaultValueComputed: 'uuid_generate_v4()'
+                              constraints:
+                                  primaryKey: true
+                                  nullable: false
+                        - column:
+                              name: user_id
+                              type: UUID
+                              constraints:
+                                  unique: true
+                                  nullable: false
+                        - column:
+                              name: token
+                              type: VARCHAR(255)
+                              constraints:
+                                  nullable: false
+                        - column:
+                              name: expiry_date
+                              type: TIMESTAMP
