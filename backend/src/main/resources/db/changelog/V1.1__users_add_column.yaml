@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: V1.1__users_add_column
+      author: aki
+      changes:
+        - addColumn:
+            tableName: users
+            columns:
+              - column:
+                  name: username
+                  type: VARCHAR(100)
+                  defaultValue: "USER"
+                  constraints:
+                    nullable: false
