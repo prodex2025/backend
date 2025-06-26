@@ -5,3 +5,5 @@ databaseChangeLog:
       file: db/changeLog/V1.1__users_add_column.yaml
   - include:
       file: db/changeLog/V1.2__refresh_token_create_table.yaml
+  - include:
+      file: db/changeLog/V1.3__restaurants_create_table.yaml
