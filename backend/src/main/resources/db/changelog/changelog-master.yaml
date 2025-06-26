@@ -17,3 +17,9 @@ databaseChangeLog:
       file: db/changeLog/V1.7__categories_create_table.yaml
   - include:
       file: db/changeLog/V1.8__restaurants_categories_create_table.yaml
+  - include:
+      file: db/changeLog/V1.9__restaurants_add_column.yaml
+  - include:
+      file: db/changeLog/V2.0__restaurant_interior_images_create_table.yaml
+  - include:
+      file: db/changeLog/V2.1__add_foreign_keys.yaml

@@ -1,0 +1,90 @@
+databaseChangeLog:
+  - changeSet:
+      id: V2.1_refresh_token_fk_ondelete_cascade
+      author: aki
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: refresh_token
+            constraintName: fk_user
+        - addForeignKeyConstraint:
+            baseTableName: refresh_token
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_user
+            onDelete: CASCADE
+
+  - changeSet:
+      id: V2.2__dishes_fk_ondelete_cascade
+      author: aki
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: dishes
+            constraintName: fk_restaurant
+        - addForeignKeyConstraint:
+            baseTableName: dishes
+            baseColumnNames: restaurant_id
+            referencedTableName: restaurants
+            referencedColumnNames: id
+            constraintName: fk_restaurant
+            onDelete: CASCADE
+
+  - changeSet:
+      id: V2.3__closed_days_fk_ondelete_cascade
+      author: aki
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: restaurants_closed_days
+            constraintName: fk_restaurant_closed_days
+        - addForeignKeyConstraint:
+            baseTableName: restaurants_closed_days
+            baseColumnNames: restaurant_id
+            referencedTableName: restaurants
+            referencedColumnNames: id
+            constraintName: fk_restaurant_closed_days
+            onDelete: CASCADE
+
+  - changeSet:
+      id: V2.4__business_hours_fk_ondelete_cascade
+      author: aki
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: restaurants_closed_days
+            constraintName: fk_restaurant_business_hours
+        - addForeignKeyConstraint:
+            baseTableName: restaurants_business_hours
+            baseColumnNames: restaurant_id
+            referencedTableName: restaurants
+            referencedColumnNames: id
+            constraintName: fk_restaurant_business_hours
+            onDelete: CASCADE
+
+  - changeSet:
+      id: V2.5__restaurant_category_fk_ondelete_cascade
+      author: aki
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: restaurants_categories
+            constraintName: fk_restaurant_category
+        - addForeignKeyConstraint:
+            baseTableName: restaurants_categories
+            baseColumnNames: restaurant_id
+            referencedTableName: restaurants
+            referencedColumnNames: id
+            constraintName: fk_restaurant_category
+            onDelete: CASCADE
+
+  - changeSet:
+      id: V2.6__category_restaurant_fk_ondelete_cascade
+      author: aki
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: restaurants_categories
+            constraintName: fk_category_restaurant
+        - addForeignKeyConstraint:
+            baseTableName: restaurants_categories
+            baseColumnNames: category_id
+            referencedTableName: categories
+            referencedColumnNames: id
+            constraintName: fk_category_restaurant
+            onDelete: CASCADE
