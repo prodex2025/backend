@@ -11,3 +11,5 @@ databaseChangeLog:
       file: db/changeLog/V1.4__dishes_create_table.yaml
   - include:
       file: db/changeLog/V1.5__restaurants_closed_days_create_table.yaml
+  - include:
+      file: db/changeLog/V1.6__restaurants_business_hours_create_table.yaml
