@@ -8,11 +8,11 @@ import lombok.NoArgsConstructor;
 import java.util.UUID;
 
 @Entity
-@Table(name = "restaurants_closed_days")
+@Table(name = "restaurants_categories")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RestaurantClosedDay {
+public class RestaurantCategory {
     @Id
     @GeneratedValue
     private UUID id;
@@ -21,7 +21,8 @@ public class RestaurantClosedDay {
     @JoinColumn(name = "restaurant_id", nullable = false)
     private Restaurant restaurant;
 
-    @Column(name = "day_of_week", nullable = false)
-    private Short dayOfWeek;
-    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
+
 }
