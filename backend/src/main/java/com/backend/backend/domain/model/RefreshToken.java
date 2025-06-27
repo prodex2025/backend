@@ -18,7 +18,7 @@ public class RefreshToken {
     private UUID id;
 
     @OneToOne
-    @Column(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @Column(name = "token", unique = true, nullable = false)
