@@ -16,6 +16,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -50,6 +51,23 @@ public class AuthController {
 
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
+
+    //ログイン状態を確認
+    @GetMapping("/status")
+    public ResponseEntity<?> checkLoginStatus(Authentication authentication) {
+        //ログイン済みUserかを判定
+        boolean isAuthenticated = authentication != null &&
+                authentication.isAuthenticated() &&
+                !(authentication instanceof AnonymousAuthenticationToken);
+        if (isAuthenticated) {
+            return ResponseEntity.ok(Map.of(
+                    "authenticated", true,
+                    "username", authentication.getName()
+            ));
+        } else {
+            return ResponseEntity.ok(Map.of("authenticated", false));
+        }
+    }
 
     //利用者新規登録
     @PostMapping
