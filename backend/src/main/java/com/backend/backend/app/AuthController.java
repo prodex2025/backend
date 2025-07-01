@@ -113,7 +113,7 @@ public class AuthController {
     @PostMapping("/refresh")
     public ResponseEntity<?> refresh(@RequestBody RefreshTokenRequestDto request) {
         Optional<RefreshToken> refreshTokenOptional = refreshTokenRepository.
-                findByToken(request.getToken());
+                findByToken(request.getRefreshToken());
         //トークンが存在しない場合
         if (refreshTokenOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("無効なリフレッシュトークン");

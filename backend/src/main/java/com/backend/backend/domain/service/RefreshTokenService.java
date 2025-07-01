@@ -25,6 +25,10 @@ public class RefreshTokenService {
     public void saveRefreshToken(String refreshTokenStr, UserDetails userDetails) {
         //Userが存在するか
         User user = userRepository.findByLoginId(userDetails.getUsername()).orElseThrow(()-> new RuntimeException("Userが存在しません"));
+
+        // 古いトークンを削除
+        refreshTokenRepository.deleteByUser(user);
+
         //リフレッシュトークオブジェクトを生成
         RefreshToken refreshToken = new RefreshToken();
         refreshToken.setUser(user);
