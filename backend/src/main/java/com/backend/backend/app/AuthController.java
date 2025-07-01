@@ -4,7 +4,9 @@ import com.backend.backend.domain.dto.LoginDto;
 import com.backend.backend.domain.dto.OwnerRegisterDto;
 import com.backend.backend.domain.dto.UserRegisterDto;
 import com.backend.backend.domain.model.Role;
+import com.backend.backend.domain.service.RefreshTokenService;
 import com.backend.backend.domain.service.UserService;
+import com.backend.backend.secuirty.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -28,7 +32,13 @@ public class AuthController {
     private UserService userService;
 
     @Autowired
-    AuthenticationManager authenticationManager;
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private JwtService jwtService;
+    
+    @Autowired
+    private RefreshTokenService refreshTokenService;
 
     //利用者新規登録
     @PostMapping
@@ -58,15 +68,32 @@ public class AuthController {
 
     //ログイン認証
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginDto loginDto) {
+    public ResponseEntity<?> login(@RequestBody LoginDto loginDto) {
+        try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             loginDto.getLoginId(),
                             loginDto.getPassword()
                     )
             );
+            //認証済みUserをセット
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            return ResponseEntity.ok("login成功");
+            //認証済みUserをUserDetails型に変換してuserDetailsに代入
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            //アクセストークン発行
+            String accessToken = jwtService.generateAccessToken(userDetails);
+            //リフレッシュトークン発行
+            String refreshToken = jwtService.generateRefreshToken(userDetails);
+            //リフレッシュトークをDBに保存
+            refreshTokenService.saveRefreshToken(refreshToken, userDetails);
+
+            return ResponseEntity.ok(Map.of("accessToken", accessToken,
+                    "refreshToken", refreshToken));
+        } catch (UsernameNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("ログイン失敗：ユーザーが見つかりません");
+        } catch (BadCredentialsException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("ログイン失敗：IDまたはパスワードが間違っています");
+        }
     }
 
 }

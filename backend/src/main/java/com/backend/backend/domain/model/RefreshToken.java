@@ -3,6 +3,7 @@ package com.backend.backend.domain.model;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
 import java.util.UUID;
@@ -11,6 +12,7 @@ import java.util.UUID;
 @Table(name = "refresh_token")
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class RefreshToken {
     @Id
     @GeneratedValue
