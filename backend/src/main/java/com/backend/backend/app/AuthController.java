@@ -2,10 +2,15 @@ package com.backend.backend.app;
 
 import com.backend.backend.domain.dto.LoginDto;
 import com.backend.backend.domain.dto.OwnerRegisterDto;
+import com.backend.backend.domain.dto.RefreshTokenRequestDto;
 import com.backend.backend.domain.dto.UserRegisterDto;
+import com.backend.backend.domain.model.RefreshToken;
 import com.backend.backend.domain.model.Role;
+import com.backend.backend.domain.model.User;
+import com.backend.backend.domain.repository.RefreshTokenRepository;
 import com.backend.backend.domain.service.RefreshTokenService;
 import com.backend.backend.domain.service.UserService;
+import com.backend.backend.secuirty.CustomUserDetailsService;
 import com.backend.backend.secuirty.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,7 +27,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.sql.Timestamp;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -39,6 +46,12 @@ public class AuthController {
     
     @Autowired
     private RefreshTokenService refreshTokenService;
+
+    @Autowired
+    private RefreshTokenRepository refreshTokenRepository;
+
+    @Autowired
+    private CustomUserDetailsService customUserDetailsService;
 
     //利用者新規登録
     @PostMapping
@@ -94,6 +107,34 @@ public class AuthController {
         } catch (BadCredentialsException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("ログイン失敗：IDまたはパスワードが間違っています");
         }
+    }
+
+    //リフレッシュトークを使用し、アクセストークンを作成
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refresh(@RequestBody RefreshTokenRequestDto request) {
+        Optional<RefreshToken> refreshTokenOptional = refreshTokenRepository.
+                findByToken(request.getToken());
+        //トークンが存在しない場合
+        if (refreshTokenOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("無効なリフレッシュトークン");
+        }
+        //値を取得
+        RefreshToken refreshToken = refreshTokenOptional.get();
+        //有効期限をチェック
+        if (refreshToken.getExpiryDate().before(new Timestamp(System.currentTimeMillis()))) {
+            //期限切れトークンを削除
+            refreshTokenRepository.delete(refreshToken);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("リフレッシュトークンが期限切れ");
+        }
+        //アクセストークンを再発行
+        User user = refreshToken.getUser();
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername(user.getLoginId());
+
+        //新しいトークンを作成
+        String newAccessToken = jwtService.generateAccessToken(userDetails);
+
+        //新しいアクセストークンを返す
+        return ResponseEntity.ok(Map.of("accessToken", newAccessToken));
     }
 
 }
