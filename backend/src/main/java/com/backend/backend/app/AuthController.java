@@ -12,6 +12,7 @@ import com.backend.backend.domain.service.RefreshTokenService;
 import com.backend.backend.domain.service.UserService;
 import com.backend.backend.secuirty.CustomUserDetailsService;
 import com.backend.backend.secuirty.JwtService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,10 +23,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.sql.Timestamp;
 import java.util.Map;
@@ -111,7 +109,7 @@ public class AuthController {
 
     //リフレッシュトークを使用し、アクセストークンを作成
     @PostMapping("/refresh")
-    public ResponseEntity<?> refresh(@RequestBody RefreshTokenRequestDto request) {
+    public ResponseEntity<?> refresh(@Valid @RequestBody RefreshTokenRequestDto request) {
         Optional<RefreshToken> refreshTokenOptional = refreshTokenRepository.
                 findByToken(request.getRefreshToken());
         //トークンが存在しない場合
@@ -120,6 +118,11 @@ public class AuthController {
         }
         //値を取得
         RefreshToken refreshToken = refreshTokenOptional.get();
+        //認証Userがトークン所有者と一致するか
+        String currentLoginId = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (!refreshToken.getUser().getLoginId().equals(currentLoginId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("他人のトークンを操作することはできません");
+        }
         //有効期限をチェック
         if (refreshToken.getExpiryDate().before(new Timestamp(System.currentTimeMillis()))) {
             //期限切れトークンを削除
@@ -129,12 +132,33 @@ public class AuthController {
         //アクセストークンを再発行
         User user = refreshToken.getUser();
         UserDetails userDetails = customUserDetailsService.loadUserByUsername(user.getLoginId());
-
         //新しいトークンを作成
         String newAccessToken = jwtService.generateAccessToken(userDetails);
 
         //新しいアクセストークンを返す
         return ResponseEntity.ok(Map.of("accessToken", newAccessToken));
+    }
+
+    //logoutトークン削除
+    @DeleteMapping("/logout")
+    public ResponseEntity<String> logout(@Valid @RequestBody RefreshTokenRequestDto request) {
+        Optional<RefreshToken> refreshTokenOptional = refreshTokenRepository.
+                findByToken(request.getRefreshToken());
+        //トークンが存在しない場合
+        if (refreshTokenOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("無効なリフレッシュトークン");
+        }
+        //値を取得
+        RefreshToken refreshToken = refreshTokenOptional.get();
+        //認証Userがトークン所有者と一致するか
+        String currentLoginId = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (!refreshToken.getUser().getLoginId().equals(currentLoginId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("他人のトークンを削除することはできません");
+        }
+        //refreshTokenを削除
+        refreshTokenRepository.delete(refreshToken);
+
+        return ResponseEntity.ok("tokenを削除しました。");
     }
 
 }
