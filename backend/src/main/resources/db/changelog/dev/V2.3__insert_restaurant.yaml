@@ -1,0 +1,41 @@
+databaseChangeLog:
+    - changeSet:
+          id: V2.3__insert_restaurant.yaml
+          author: okishima
+          changes:
+              - insert:
+                    tableName: restaurants
+                    columns:
+                        - column:
+                              name: id
+                              valueComputed: 'uuid_generate_v4()'
+                        - column:
+                              name: owner_id
+                              value: 'b9271e89-bd9c-4769-9f89-1cae3e803917'
+                        - column:
+                              name: name
+                              value: 'testowner'
+                        - column:
+                              name: address
+                              value: '兵庫県神戸市中央区北野町1-1-8'
+                        - column:
+                              name: post_code
+                              value: '6500002'
+                        - column:
+                              name: phone
+                              value: '12345678910'
+                        - column:
+                              name: email
+                              value: 'example@example.com'
+                        - column:
+                              name: description
+                              value: 'tesuto'
+                        - column:
+                              name: created_at
+                              valueComputed: 'CURRENT_TIMESTAMP'
+                        - column:
+                              name: updated_at
+                              valueComputed: 'CURRENT_TIMESTAMP'
+                        - column:
+                              name: image_url
+                              value: 'example.com'
