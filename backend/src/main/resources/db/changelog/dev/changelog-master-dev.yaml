@@ -1,4 +1,5 @@
 databaseChangeLog:
   - include:
       file: db/changeLog/dev/V2.2__insert_user.yaml
+  - include:
       file: db/changeLog/dev/V2.3__insert_restaurant.yaml

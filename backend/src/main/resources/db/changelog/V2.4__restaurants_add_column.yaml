@@ -1,0 +1,20 @@
+databaseChangeLog:
+  - changeSet:
+      id: V2.4__restaurants_add_column
+      author: okishima
+      changes:
+        - addColumn:
+            tableName: restaurants
+            columns:
+              - column:
+                  name: approved
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_published
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false

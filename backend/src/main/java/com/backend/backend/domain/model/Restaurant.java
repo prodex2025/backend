@@ -61,4 +61,9 @@ public class Restaurant {
         updatedAt = Timestamp.from(Instant.now());
     }
 
+    @Column(name = "approved", nullable = false)
+    private Boolean approved;
+
+    @Column(name = "is_published", nullable = false)
+    private Boolean isPublished;
 }

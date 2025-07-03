@@ -39,3 +39,9 @@ databaseChangeLog:
                         - column:
                               name: image_url
                               value: 'example.com'
+                        - column:
+                              name: approved
+                              valueBoolean: true
+                        - column:
+                              name: is_published
+                              valueBoolean: true
