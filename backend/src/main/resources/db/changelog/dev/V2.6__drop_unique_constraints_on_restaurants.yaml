@@ -1,0 +1,11 @@
+databaseChangeLog:
+    - changeSet:
+          id: V2.6__drop_unique_constraints_on_restaurants
+          author: okishima
+          changes:
+              - dropUniqueConstraint:
+                    constraintName: restaurants_phone_key
+                    tableName: restaurants
+              - dropUniqueConstraint:
+                    constraintName: restaurants_email_key
+                    tableName: restaurants
