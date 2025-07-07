@@ -19,7 +19,7 @@ public class Restaurant {
     @GeneratedValue
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "owner_id", nullable = false)
     private User user;
 
@@ -43,6 +43,12 @@ public class Restaurant {
 
     @Column(name = "image_url", nullable = false)
     private String imageUrl;
+
+    @Column(name = "approved", nullable = false)
+    private Boolean approved;
+
+    @Column(name = "is_published", nullable = false)
+    private Boolean isPublished;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Timestamp createdAt;

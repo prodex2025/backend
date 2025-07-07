@@ -1,0 +1,47 @@
+databaseChangeLog:
+  - changeSet:
+      id: V2.2__insert_user.yaml
+      author: okishima
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  valueComputed: "uuid_generate_v4()"
+              - column:
+                  name: login_id
+                  value: "testuser"
+              - column:
+                  name: password
+                  value: "$2a$08$W9Xtr01T3C1OEHkvG7XgJOxObzX8fZc1cjKPKJpgnJm/Zr6eTVjcu"
+              - column:
+                  name: role
+                  value: "ROLE_USER"
+              - column:
+                  name: username
+                  value: "testuser"
+              - column:
+                  name: created_at
+                  valueComputed: "CURRENT_TIMESTAMP"
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  valueComputed: "uuid_generate_v4()"
+              - column:
+                  name: login_id
+                  value: "testowner"
+              - column:
+                  name: password
+                  value: "$2a$08$xiWd0nBaK736iJT5YtpfDuelsbgGkMV6shnkBPiAdG0aTn/uC/pfy"
+              - column:
+                  name: role
+                  value: "ROLE_OWNER"
+              - column:
+                  name: username
+                  value: "testowner"
+              - column:
+                  name: created_at
+                  valueComputed: "CURRENT_TIMESTAMP"

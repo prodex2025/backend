@@ -1,0 +1,47 @@
+databaseChangeLog:
+    - changeSet:
+          id: V2.5__insert_restaurant.yaml
+          author: okishima
+          changes:
+              - insert:
+                    tableName: restaurants
+                    columns:
+                        - column:
+                              name: id
+                              valueComputed: 'uuid_generate_v4()'
+                        - column:
+                              name: owner_id
+                              value: 'b9271e89-bd9c-4769-9f89-1cae3e803917'
+                        - column:
+                              name: name
+                              value: 'サイゼリヤ'
+                        - column:
+                              name: address
+                              value: '兵庫県神戸市中央区北野町'
+                        - column:
+                              name: post_code
+                              value: '1000001'
+                        - column:
+                              name: phone
+                              value: '98765432101'
+                        - column:
+                              name: email
+                              value: 'example@example.com'
+                        - column:
+                              name: description
+                              value: 'tesuto1'
+                        - column:
+                              name: created_at
+                              valueComputed: 'CURRENT_TIMESTAMP'
+                        - column:
+                              name: updated_at
+                              valueComputed: 'CURRENT_TIMESTAMP'
+                        - column:
+                              name: image_url
+                              value: 'example.com'
+                        - column:
+                              name: approved
+                              valueBoolean: true
+                        - column:
+                              name: is_published
+                              valueBoolean: true
