@@ -1,6 +1,6 @@
 databaseChangeLog:
     - changeSet:
-          id: V2.5__insert_restaurant.yaml
+          id: V2.5__insert_restaurant
           author: okishima
           changes:
               - insert:
@@ -11,7 +11,7 @@ databaseChangeLog:
                               valueComputed: 'uuid_generate_v4()'
                         - column:
                               name: owner_id
-                              value: 'b9271e89-bd9c-4769-9f89-1cae3e803917'
+                              value: '${restaurant.owner.id2}'
                         - column:
                               name: name
                               value: 'サイゼリヤ'

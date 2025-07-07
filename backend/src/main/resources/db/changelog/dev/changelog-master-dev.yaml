@@ -2,8 +2,8 @@ databaseChangeLog:
     - include:
           file: db/changeLog/dev/V2.2__insert_user.yaml
     - include:
-          file: db/changeLog/dev/V2.3__insert_restaurant.yaml
+        file: db/changeLog/dev/V2.3__insert_restaurant.yaml
     - include:
-          file: db/changeLog/dev/V2.5__insert_restaurant.yaml
+        file: db/changeLog/dev/V2.5__insert_restaurant.yaml
     - include:
-          file: db/changeLog/dev/V2.6__drop_unique_constraints_on_restaurants.yaml
+        file: db/changeLog/dev/V2.6__drop_unique_constraints_on_restaurants.yaml

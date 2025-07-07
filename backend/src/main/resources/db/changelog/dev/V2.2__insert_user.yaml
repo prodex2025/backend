@@ -1,6 +1,6 @@
 databaseChangeLog:
   - changeSet:
-      id: V2.2__insert_user.yaml
+      id: V2.2__insert_user
       author: okishima
       changes:
         - insert:
