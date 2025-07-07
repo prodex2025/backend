@@ -27,3 +27,5 @@ databaseChangeLog:
       file: db/changeLog/V2.4__restaurants_add_column.yaml
   - include:
       file: db/changeLog/V2.7__allergies_create_table.yaml
+  - include:
+      file: db/changeLog/V2.8__dishes_allergies_create_table.yaml
