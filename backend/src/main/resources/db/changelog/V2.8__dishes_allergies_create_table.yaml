@@ -1,0 +1,41 @@
+databaseChangeLog:
+  - changeSet:
+      id: V2.8__dishes_allergies_create_table
+      author: aki
+      preConditions:
+        - sqlCheck:
+            expectedResult: 1
+            sql: "SELECT 1 FROM pg_available_extensions WHERE name = 'uuid-ossp'"
+      changes:
+        - createTable:
+            tableName: dishes_allergies
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  defaultValueComputed: "uuid_generate_v4()"
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: dish_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: allergy_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: dishes_allergies
+            baseColumnNames: dish_id
+            referencedTableName: dishes
+            referencedColumnNames: id
+            constraintName: fk_dish_allergy
+        - addForeignKeyConstraint:
+            baseTableName: dishes_allergies
+            baseColumnNames: allergy_id
+            referencedTableName: allergies
+            referencedColumnNames: id
+            constraintName: fk_allergy_dish
