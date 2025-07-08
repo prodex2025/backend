@@ -7,3 +7,7 @@ databaseChangeLog:
         file: db/changeLog/dev/V2.5__insert_restaurant.yaml
     - include:
         file: db/changeLog/dev/V2.6__drop_unique_constraints_on_restaurants.yaml
+    - include:
+          file: db/changeLog/dev/V2.9__insert_category.yaml
+    - include:
+        file: db/changeLog/dev/V3.0__insert_restaurant_category.yaml

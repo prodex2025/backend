@@ -1,0 +1,45 @@
+databaseChangeLog:
+  - changeSet:
+      id: V2.9__insert_category
+      author: aki
+      preConditions:
+        - sqlCheck:
+            expectedResult: 1
+            sql: "SELECT 1 FROM pg_available_extensions WHERE name = 'uuid-ossp'"
+      changes:
+        - insert:
+            tableName: categories
+            columns:
+              - column:
+                  name: id
+                  valueComputed: 'uuid_generate_v4()'
+              - column:
+                  name: name
+                  value: 'イタリアン'
+        - insert:
+            tableName: categories
+            columns:
+              - column:
+                  name: id
+                  valueComputed: 'uuid_generate_v4()'
+              - column:
+                  name: name
+                  value: '中華'
+        - insert:
+            tableName: categories
+            columns:
+              - column:
+                  name: id
+                  valueComputed: 'uuid_generate_v4()'
+              - column:
+                  name: name
+                  value: '和食'
+        - insert:
+            tableName: categories
+            columns:
+              - column:
+                  name: id
+                  valueComputed: 'uuid_generate_v4()'
+              - column:
+                  name: name
+                  value: 'フレンチ'
