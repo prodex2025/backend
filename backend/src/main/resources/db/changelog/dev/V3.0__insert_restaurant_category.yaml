@@ -1,0 +1,57 @@
+databaseChangeLog:
+  - changeSet:
+      id: V3.0__insert_restaurant_category
+      author: aki
+      preConditions:
+        - sqlCheck:
+            expectedResult: 1
+            sql: "SELECT 1 FROM pg_available_extensions WHERE name = 'uuid-ossp'"
+      changes:
+        - insert:
+            tableName: restaurants_categories
+            columns:
+              - column:
+                  name: id
+                  valueComputed: 'uuid_generate_v4()'
+              - column:
+                  name: restaurant_id
+                  value: '${restaurant.id1}'
+              - column:
+                  name: category_id
+                  value: '${category.id1}'
+        - insert:
+            tableName: restaurants_categories
+            columns:
+              - column:
+                  name: id
+                  valueComputed: 'uuid_generate_v4()'
+              - column:
+                  name: restaurant_id
+                  value: '${restaurant.id1}'
+              - column:
+                  name: category_id
+                  value: '${category.id2}'
+        - insert:
+            tableName: restaurants_categories
+            columns:
+              - column:
+                  name: id
+                  valueComputed: 'uuid_generate_v4()'
+              - column:
+                  name: restaurant_id
+                  value: '${restaurant.id2}'
+              - column:
+                  name: category_id
+                  value: '${category.id1}'
+        - insert:
+            tableName: restaurants_categories
+            columns:
+              - column:
+                  name: id
+                  valueComputed: 'uuid_generate_v4()'
+              - column:
+                  name: restaurant_id
+                  value: '${restaurant.id2}'
+              - column:
+                  name: category_id
+                  value: '${category.id4}'
