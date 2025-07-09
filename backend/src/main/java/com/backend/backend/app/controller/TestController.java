@@ -1,11 +1,15 @@
 package com.backend.backend.app.controller;
 
-import com.backend.backend.domain.dto.RestaurantCategoryDetailDto;
-import com.backend.backend.domain.dto.RestaurantCategoryDto;
+import com.backend.backend.domain.dto.*;
 import com.backend.backend.domain.model.Restaurant;
+import com.backend.backend.domain.model.RestaurantBusinessHours;
 import com.backend.backend.domain.model.RestaurantCategory;
+import com.backend.backend.domain.model.RestaurantClosedDay;
+import com.backend.backend.domain.repository.RestaurantBusinessHoursRepository;
 import com.backend.backend.domain.repository.RestaurantCategoryRepository;
+import com.backend.backend.domain.repository.RestaurantClosedDayRepository;
 import com.backend.backend.domain.repository.RestaurantRepository;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,11 +31,17 @@ public class TestController {
     @Autowired
     private RestaurantCategoryRepository restaurantCategoryRepository;
 
+    @Autowired
+    private RestaurantBusinessHoursRepository restaurantBusinessHoursRepository;
+
+    @Autowired
+    private RestaurantClosedDayRepository restaurantClosedDayRepository;
+
     //店舗詳細
-    @GetMapping("/{roomId}")
-    public ResponseEntity<?> test(@PathVariable UUID roomId) {
-        Restaurant restaurant = restaurantRepository.findById(roomId).orElseThrow(()->new RuntimeException("店舗を取得できませんでした"));
-        List<RestaurantCategory> categories = restaurantCategoryRepository.findByRestaurantId(roomId);
+    @GetMapping("/{restaurantId}")
+    public ResponseEntity<?> test(@PathVariable UUID restaurantId) {
+        Restaurant restaurant = restaurantRepository.findById(restaurantId).orElseThrow(()->new RuntimeException("店舗を取得できませんでした"));
+        List<RestaurantCategory> categories = restaurantCategoryRepository.findByRestaurantId(restaurantId);
         //店舗詳細オブジェクトを作成
         RestaurantCategoryDetailDto restaurantCategoryDetailDto = new RestaurantCategoryDetailDto(
                 restaurant.getId(),
@@ -42,6 +52,22 @@ public class TestController {
         );
         return ResponseEntity.ok(restaurantCategoryDetailDto);
     }
+    //店舗詳細タブ一覧
+    @GetMapping("/{restaurantId}/detail")
+    public ResponseEntity<?> restaurantDetail(@PathVariable UUID restaurantId) {
+        Restaurant restaurant = restaurantRepository.findById(restaurantId).orElseThrow(()->new RuntimeException("店舗を取得できませんでした"));
+        List<RestaurantBusinessHours> businessHours = restaurantBusinessHoursRepository.findByRestaurantId(restaurantId);
+        List<RestaurantClosedDay> closedDays = restaurantClosedDayRepository.findByRestaurantId(restaurantId);
+        RestaurantDetailDto restaurantDetailDto = new RestaurantDetailDto(
+                restaurant.getAddress(),
+                restaurant.getPhone(),
+                restaurant.getDescription(),
+                businessHours.stream().map(BusinessHoursDto::fromEntity).toList(),
+                closedDays.stream().map(ClosedDayDto::fromEntity).toList()
+        );
+        return ResponseEntity.ok(restaurantDetailDto);
+    }
+
     //公開
     @GetMapping("/true")
     public ResponseEntity<?> test1(@RequestParam(defaultValue = "0") int p) {
