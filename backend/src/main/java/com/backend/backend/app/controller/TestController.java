@@ -34,6 +34,9 @@ public class TestController {
     @Autowired
     private DishRepository dishRepository;
 
+    @Autowired
+    private DishAllergyRepository dishAllergyRepository;
+
     //店舗詳細
     @GetMapping("/{restaurantId}")
     public ResponseEntity<?> test(@PathVariable UUID restaurantId) {
@@ -56,6 +59,7 @@ public class TestController {
         List<RestaurantBusinessHours> businessHours = restaurantBusinessHoursRepository.findByRestaurantId(restaurantId);
         List<RestaurantClosedDay> closedDays = restaurantClosedDayRepository.findByRestaurantId(restaurantId);
         RestaurantDetailDto restaurantDetailDto = new RestaurantDetailDto(
+                restaurant.getId(),
                 restaurant.getAddress(),
                 restaurant.getPhone(),
                 restaurant.getDescription(),
@@ -108,6 +112,20 @@ public class TestController {
                 dish.getImageUrl()
         ));
         return ResponseEntity.ok(dtoPage);
+    }
+
+    @GetMapping("dishes/{dishesId}")
+    public ResponseEntity<?> findByDish(@PathVariable UUID dishesId) {
+        Dish dish = dishRepository.findById(dishesId).orElseThrow(()-> new RuntimeException("値を取得できませんでした"));
+        List<DishAllergy> dishAllergy = dishAllergyRepository.findByDishId(dishesId);
+        Dish3dDto dish3dDto = new Dish3dDto(
+                dish.getId(),
+                dish.getName(),
+                dish.getVideoUrl(),
+                dish.getDescription(),
+                dishAllergy.stream().map(AllergyDto::fromEntity).toList()
+        );
+        return ResponseEntity.ok(dish3dDto);
     }
 
 }

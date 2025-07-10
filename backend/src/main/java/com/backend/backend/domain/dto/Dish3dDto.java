@@ -10,11 +10,10 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RestaurantDetailDto {
+public class Dish3dDto {
     private UUID id;
-    private String address;
-    private String phone;
+    private String name;
+    private String videoUrl;
     private String description;
-    private List<BusinessHoursDto> businessHoursDtoList;
-    private List<ClosedDayDto> closedDayDtoList;
+    private List<AllergyDto> allergyDtoList;
 }
