@@ -15,4 +15,5 @@ databaseChangeLog:
       file: db/changeLog/dev/V3.1__insert_business_hours.yaml
   - include:
       file: db/changeLog/dev/V3.2__insert_closed_days.yaml
-
+  - include:
+      file: db/changeLog/dev/V3.3__inset_dishes.yaml
