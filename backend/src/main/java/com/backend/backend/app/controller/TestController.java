@@ -7,6 +7,7 @@ import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -126,6 +127,33 @@ public class TestController {
                 dishAllergy.stream().map(AllergyDto::fromEntity).toList()
         );
         return ResponseEntity.ok(dish3dDto);
+    }
+
+    @GetMapping("owner/restaurant")
+    public ResponseEntity<?> OwnerRestaurants(@RequestParam(defaultValue = "0") int p, @RequestParam UUID userId) {
+        //経営者の登録店舗を取得
+        Page<Restaurant> restaurants = restaurantRepository.findByUserId(PageRequest.of(p, 10), userId);
+
+        Page<OwnerRestaurantsDto> dtoPage = restaurants.map(restaurant -> {
+            // 中間テーブルからカテゴリを取得
+            List<RestaurantCategory> restaurantCategories = restaurantCategoryRepository.findByRestaurantId(restaurant.getId());
+            //カテゴリを取得
+            List<RestaurantCategoryDto> categoryList = restaurantCategories.stream()
+                    .map(RestaurantCategoryDto::fromEntity)
+                    .toList();
+
+            return new OwnerRestaurantsDto(
+                    restaurant.getId(),
+                    restaurant.getName(),
+                    restaurant.getAddress(),
+                    restaurant.getPostCode(),
+                    restaurant.getImageUrl(),
+                    categoryList
+            );
+        });
+
+        return ResponseEntity.ok(dtoPage);
+
     }
 
 }
