@@ -29,6 +29,9 @@ public class Dish {
     @Column(name = "price", nullable = false)
     private Integer price;
 
+    @Column(name = "description")
+    private String description;
+
     @Column(name = "image_url", nullable = false)
     private String imageUrl;
 
