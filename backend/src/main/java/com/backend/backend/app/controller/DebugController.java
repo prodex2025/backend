@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/debug")
 public class DebugController {
@@ -25,7 +28,7 @@ public class DebugController {
     //店舗とカテゴリーの中間リポジトリを扱う
     @Autowired
     private RestaurantCategoryRepository restaurantCategoryRepository;
-    
+
     //1 メソッド書く
     @GetMapping("/true")
     public ResponseEntity<?> findByApprovedTrue(@RequestParam(defaultValue = "0") int p) {
@@ -72,6 +75,19 @@ public class DebugController {
     @GetMapping("/publishedFalseAndName")
     public ResponseEntity<?> findByIsPublishedFalseAndNameContaining(@RequestParam(defaultValue = "0") int p, @RequestParam String keyword) {
         Page<Restaurant> restaurants = restaurantRepository.findByIsPublishedFalseAndNameContaining(PageRequest.of(p, 10), keyword);
+        return ResponseEntity.ok(restaurants);
+    }
+
+    @GetMapping("/CategoryIDs")
+    public ResponseEntity<?> findRestaurantsByCategoryIds(@RequestParam(defaultValue = "0") int p, @RequestParam List<UUID> categoryIds ) {
+        Page<Restaurant> restaurants = restaurantCategoryRepository.findRestaurantsByCategoryIds(categoryIds, PageRequest.of(p, 10));
+        return ResponseEntity.ok(restaurants);
+    }
+
+    @GetMapping("/CategoryIDsAndKeyword")
+    public ResponseEntity<?> findRestaurantsByCategoryIdsAndKeyword(@RequestParam(defaultValue = "0") int p, @RequestParam List<UUID> categoryIds, @RequestParam String keyword) {
+        String likeKeyword = "%" + keyword + "%";
+        Page<Restaurant> restaurants = restaurantCategoryRepository.findRestaurantsByCategoryIdsAndKeyword(categoryIds, likeKeyword, PageRequest.of(p, 10));
         return ResponseEntity.ok(restaurants);
     }
 }
