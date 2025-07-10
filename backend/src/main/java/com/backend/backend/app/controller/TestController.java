@@ -1,14 +1,8 @@
 package com.backend.backend.app.controller;
 
 import com.backend.backend.domain.dto.*;
-import com.backend.backend.domain.model.Restaurant;
-import com.backend.backend.domain.model.RestaurantBusinessHours;
-import com.backend.backend.domain.model.RestaurantCategory;
-import com.backend.backend.domain.model.RestaurantClosedDay;
-import com.backend.backend.domain.repository.RestaurantBusinessHoursRepository;
-import com.backend.backend.domain.repository.RestaurantCategoryRepository;
-import com.backend.backend.domain.repository.RestaurantClosedDayRepository;
-import com.backend.backend.domain.repository.RestaurantRepository;
+import com.backend.backend.domain.model.*;
+import com.backend.backend.domain.repository.*;
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -36,6 +30,9 @@ public class TestController {
 
     @Autowired
     private RestaurantClosedDayRepository restaurantClosedDayRepository;
+
+    @Autowired
+    private DishRepository dishRepository;
 
     //店舗詳細
     @GetMapping("/{restaurantId}")
@@ -99,6 +96,18 @@ public class TestController {
         String likeKeyword = "%" + keyword + "%";
         Page<Restaurant> restaurants = restaurantCategoryRepository.findRestaurantsByCategoryIdsAndKeyword(categoryIds,likeKeyword, PageRequest.of(p, 10));
         return ResponseEntity.ok(restaurants);
+    }
+
+    @GetMapping("/{restaurantId}/dishes")
+    public ResponseEntity<?> findByDishList(@RequestParam(defaultValue = "0") int p, @PathVariable UUID restaurantId) {
+        Page<Dish> dishesList = dishRepository.findByRestaurantId(PageRequest.of(p, 10), restaurantId);
+        Page<DishesListDto> dtoPage = dishesList.map(dish -> new DishesListDto(
+                dish.getId(),
+                dish.getName(),
+                dish.getPrice(),
+                dish.getImageUrl()
+        ));
+        return ResponseEntity.ok(dtoPage);
     }
 
 }
