@@ -17,3 +17,7 @@ databaseChangeLog:
       file: db/changeLog/dev/V3.2__insert_closed_days.yaml
   - include:
       file: db/changeLog/dev/V3.3__inset_dishes.yaml
+  - include:
+      file: db/changeLog/dev/V3.4__insert_allergies.yaml
+  - include:
+      file: db/changeLog/dev/V3.5__insert_dishes_allergies.yaml

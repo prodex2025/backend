@@ -1,0 +1,45 @@
+databaseChangeLog:
+  - changeSet:
+      id: V3.5__insert_dishes_allergies
+      author: aki
+      preConditions:
+        - sqlCheck:
+            expectedResult: 1
+            sql: "SELECT 1 FROM pg_available_extensions WHERE name = 'uuid-ossp'"
+      changes:
+        - insert:
+            tableName: dishes_allergies
+            columns:
+              - column:
+                  name: id
+                  valueComputed: 'uuid_generate_v4()'
+              - column:
+                  name: dish_id
+                  value: '${dish.id1}'
+              - column:
+                  name: allergy_id
+                  value: '${allergy.id2}'
+        - insert:
+            tableName: dishes_allergies
+            columns:
+              - column:
+                  name: id
+                  valueComputed: 'uuid_generate_v4()'
+              - column:
+                  name: dish_id
+                  value: '${dish.id2}'
+              - column:
+                  name: allergy_id
+                  value: '${allergy.id2}'
+        - insert:
+            tableName: dishes_allergies
+            columns:
+              - column:
+                  name: id
+                  valueComputed: 'uuid_generate_v4()'
+              - column:
+                  name: dish_id
+                  value: '${dish.id2}'
+              - column:
+                  name: allergy_id
+                  value: '${allergy.id1}'
