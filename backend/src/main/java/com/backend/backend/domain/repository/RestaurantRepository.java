@@ -39,4 +39,7 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, UUID> {
     // 非公開されていて、かつキーワード検索（検索 + フィルタ）
     Page<Restaurant> findByIsPublishedFalseAndNameContaining(Pageable pageable, String keyword);
 
+    //経営者登録店舗一覧
+    Page<Restaurant> findByUserId(Pageable pageable, UUID userId);
+
 }
