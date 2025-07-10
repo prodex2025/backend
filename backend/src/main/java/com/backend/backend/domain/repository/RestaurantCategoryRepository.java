@@ -33,4 +33,5 @@ public interface RestaurantCategoryRepository extends JpaRepository<RestaurantCa
             Pageable pageable
     );
 
+    List<RestaurantCategory> findByRestaurantId(UUID roomId);
 }

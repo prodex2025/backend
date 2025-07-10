@@ -1,0 +1,33 @@
+databaseChangeLog:
+  - changeSet:
+      id: V3.2__insert_closed_days
+      author: aki
+      preConditions:
+        - sqlCheck:
+            expectedResult: 1
+            sql: "SELECT 1 FROM pg_available_extensions WHERE name = 'uuid-ossp'"
+      changes:
+        - insert:
+            tableName: restaurants_closed_days
+            columns:
+              - column:
+                  name: id
+                  valueComputed: 'uuid_generate_v4()'
+              - column:
+                  name: restaurant_id
+                  value: '${restaurant.id1}'
+              - column:
+                  name: day_of_week
+                  value: 0
+        - insert:
+            tableName: restaurants_closed_days
+            columns:
+              - column:
+                  name: id
+                  valueComputed: 'uuid_generate_v4()'
+              - column:
+                  name: restaurant_id
+                  value: '${restaurant.id2}'
+              - column:
+                  name: day_of_week
+                  value: 2

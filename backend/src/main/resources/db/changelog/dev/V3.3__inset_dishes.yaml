@@ -1,0 +1,86 @@
+databaseChangeLog:
+  - changeSet:
+      id: V3.3__inset_dishes
+      author: aki
+      preConditions:
+        - sqlCheck:
+            expectedResult: 1
+            sql: "SELECT 1 FROM pg_available_extensions WHERE name = 'uuid-ossp'"
+      changes:
+        - insert:
+            tableName: dishes
+            columns:
+              - column:
+                  name: id
+                  valueComputed: 'uuid_generate_v4()'
+              - column:
+                  name: restaurant_id
+                  value: '${restaurant.id1}'
+              - column:
+                  name: name
+                  value: 'パスタ'
+              - column:
+                  name: price
+                  value: 1000
+              - column:
+                  name: description
+                  value: '固めのパスタ'
+              - column:
+                  name: image_url
+                  value: 'test'
+              - column:
+                  name: video_url
+                  value: 'test'
+        - insert:
+            tableName: dishes
+            columns:
+              - column:
+                  name: id
+                  valueComputed: 'uuid_generate_v4()'
+              - column:
+                  name: restaurant_id
+                  value: '${restaurant.id1}'
+              - column:
+                  name: name
+                  value: 'たこ焼き'
+              - column:
+                  name: price
+                  value: 12445
+              - column:
+                  name: description
+                  value: 'たこ焼きたこ焼き'
+              - column:
+                  name: image_url
+                  value: 'test'
+              - column:
+                  name: video_url
+                  value: 'test'
+        - insert:
+            tableName: dishes
+            columns:
+              - column:
+                  name: id
+                  valueComputed: 'uuid_generate_v4()'
+              - column:
+                  name: restaurant_id
+                  value: '${restaurant.id2}'
+              - column:
+                  name: name
+                  value: 'ミラノ風ドリア'
+              - column:
+                  name: price
+                  value: 300
+              - column:
+                  name: description
+                  value: 'からだにやさしく、お子様からお年寄りまで食べやすい、シンプルで食べ飽きないドリアです。
+独自の製法で作ったホワイトソースは、ミルク本来の味わい。
+ミートソースは、牛肉と野菜の旨みを活かしています。
+ターメリックライスにかけた2種のソースとチーズが絡み合い、素材それぞれの味が楽しめ、濃厚なのに食べ飽きません。
+オーブンでこんがり焼く香りが店内に広がり、食べたい気分を高めます。
+40年以上こだわり続ける、サイゼリヤが開発したドリアです。'
+              - column:
+                  name: image_url
+                  value: 'test'
+              - column:
+                  name: video_url
+                  value: 'test'
