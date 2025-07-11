@@ -44,6 +44,9 @@ public class Restaurant {
     @Column(name = "image_url", nullable = false)
     private String imageUrl;
 
+    @Column(name = "interior_image_url", nullable = false)
+    private String interiorImageUrl;
+
     @Column(name = "approved", nullable = false)
     private Boolean approved;
 
