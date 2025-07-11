@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: V3.7__restaurants_add_column
+      author: aki
+      changes:
+        - addColumn:
+            tableName: restaurants
+            columns:
+              - column:
+                  name: interior_image_url
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
