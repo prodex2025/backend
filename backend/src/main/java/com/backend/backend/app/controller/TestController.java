@@ -64,6 +64,7 @@ public class TestController {
                 restaurant.getAddress(),
                 restaurant.getPhone(),
                 restaurant.getDescription(),
+                restaurant.getInteriorImageUrl(),
                 businessHours.stream().map(BusinessHoursDto::fromEntity).toList(),
                 closedDays.stream().map(ClosedDayDto::fromEntity).toList()
         );
@@ -151,9 +152,30 @@ public class TestController {
                     categoryList
             );
         });
+        return ResponseEntity.ok(dtoPage);
+    }
+
+    @GetMapping("/owner/{restaurantId}/dishes")
+    public ResponseEntity<?> findByOwnerDishList(@RequestParam(defaultValue = "0") int p, @PathVariable UUID restaurantId) {
+        Page<Dish> OwnerDishesListDto = dishRepository.findByRestaurantId(PageRequest.of(p, 10), restaurantId);
+        Page<OwnerDishesListDto> dtoPage = OwnerDishesListDto.map(dish -> {
+            // 中間テーブルからカテゴリを取得
+            List<DishAllergy> dishAllergies = dishAllergyRepository.findByDishId(dish.getId());
+            //カテゴリを取得
+            List<AllergyDto> allergyDtoList= dishAllergies.stream().map(AllergyDto::fromEntity)
+                    .toList();
+            return new OwnerDishesListDto(
+                    dish.getId(),
+                    dish.getName(),
+                    dish.getPrice(),
+                    dish.getDescription(),
+                    dish.getImageUrl(),
+                    dish.getVideoUrl(),
+                    allergyDtoList
+            );
+        });
 
         return ResponseEntity.ok(dtoPage);
-
     }
 
 }
