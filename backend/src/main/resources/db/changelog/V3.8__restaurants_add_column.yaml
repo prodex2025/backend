@@ -1,0 +1,17 @@
+databaseChangeLog:
+  - changeSet:
+      id: V3.8__restaurants_add_column
+      author: aki
+      changes:
+        - addColumn:
+            tableName: restaurants
+            columns:
+              - column:
+                  name: application_date
+                  type: DATE
+        - addColumn:
+            tableName: restaurants
+            columns:
+              - column:
+                  name: approval_date
+                  type: DATE
