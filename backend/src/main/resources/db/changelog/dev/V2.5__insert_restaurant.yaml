@@ -7,41 +7,47 @@ databaseChangeLog:
                     tableName: restaurants
                     columns:
                         - column:
-                              name: id
-                              valueComputed: 'uuid_generate_v4()'
+                            name: id
+                            valueComputed: 'uuid_generate_v4()'
                         - column:
-                              name: owner_id
-                              value: '${restaurant.owner.id2}'
+                            name: owner_id
+                            value: '${restaurant.owner.id1}'
                         - column:
-                              name: name
-                              value: 'サイゼリヤ'
+                            name: name
+                            value: 'サイゼリヤ'
                         - column:
-                              name: address
-                              value: '兵庫県神戸市中央区北野町'
+                            name: address
+                            value: '兵庫県神戸市中央区北野町'
                         - column:
-                              name: post_code
-                              value: '1000001'
+                            name: post_code
+                            value: '1000001'
                         - column:
-                              name: phone
-                              value: '98765432101'
+                            name: phone
+                            value: '98765432101'
                         - column:
-                              name: email
-                              value: 'example@example.com'
+                            name: email
+                            value: 'example@example.com'
                         - column:
-                              name: description
-                              value: 'tesuto1'
+                            name: description
+                            value: 'tesuto1'
                         - column:
-                              name: created_at
-                              valueComputed: 'CURRENT_TIMESTAMP'
+                            name: created_at
+                            valueComputed: 'CURRENT_TIMESTAMP'
                         - column:
-                              name: updated_at
-                              valueComputed: 'CURRENT_TIMESTAMP'
+                            name: updated_at
+                            valueComputed: 'CURRENT_TIMESTAMP'
                         - column:
-                              name: image_url
-                              value: 'example.com'
+                            name: image_url
+                            value: 'example.com'
                         - column:
-                              name: approved
-                              valueBoolean: true
+                            name: approved
+                            valueBoolean: true
                         - column:
-                              name: is_published
-                              valueBoolean: true
+                            name: is_published
+                            valueBoolean: true
+                        - column:
+                            name: is_published
+                            valueBoolean: true
+                        - column:
+                            name: interior_image_url
+                            value: 'example.com'
