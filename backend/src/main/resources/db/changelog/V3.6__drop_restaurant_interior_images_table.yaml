@@ -1,0 +1,8 @@
+databaseChangeLog:
+  -  changeSet:
+       id: V3.6__drop_restaurant_interior_images_table
+       author: aki
+       changes:
+         -  dropTable:
+              cascadeConstraints:  true
+              tableName:  restaurant_interior_images
