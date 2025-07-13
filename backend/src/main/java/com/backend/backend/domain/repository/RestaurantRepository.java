@@ -28,10 +28,10 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, UUID> {
     Page<Restaurant> findByNameContaining(Pageable pageable, String keyword);
 
     // 承認されていて、かつキーワード検索
-    Page<Restaurant> findByApprovedFalseAndNameContaining(Pageable pageable, String keyword);
+    Page<Restaurant> findByApprovedTrueAndNameContaining(Pageable pageable, String keyword);
 
     // 未承認されていて、かつキーワード検索
-    Page<Restaurant> findByApprovedTrueAndNameContaining(Pageable pageable, String keyword);
+    Page<Restaurant> findByApprovedFalseAndNameContaining(Pageable pageable, String keyword);
 
     // 公開されていて、かつキーワード検索
     Page<Restaurant> findByIsPublishedTrueAndNameContaining(Pageable pageable, String keyword);

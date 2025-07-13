@@ -33,5 +33,61 @@ public interface RestaurantCategoryRepository extends JpaRepository<RestaurantCa
             Pageable pageable
     );
 
+    //承認済み&カテゴリ選択&検索
+    @Query("""
+    SELECT DISTINCT rc.restaurant FROM RestaurantCategory rc
+    WHERE rc.category.id IN :categoryIds
+    AND rc.restaurant.name LIKE :keyword
+    AND rc.restaurant.approved = true
+    ORDER BY rc.restaurant.createdAt DESC
+    """)
+    Page<Restaurant> findRestaurantsByCategoryIdsAndKeywordAndApprovedTure(
+            @Param("categoryIds") List<UUID> categoryIds,
+            @Param("keyword") String keyword,
+            Pageable pageable
+    );
+
+    //未承認済み&カテゴリ選択&検索
+    @Query("""
+    SELECT DISTINCT rc.restaurant FROM RestaurantCategory rc
+    WHERE rc.category.id IN :categoryIds
+    AND rc.restaurant.name LIKE :keyword
+    AND rc.restaurant.approved = false
+    ORDER BY rc.restaurant.createdAt DESC
+    """)
+    Page<Restaurant> findRestaurantsByCategoryIdsAndKeywordAndApprovedFalse(
+            @Param("categoryIds") List<UUID> categoryIds,
+            @Param("keyword") String keyword,
+            Pageable pageable
+    );
+
+    //公開&カテゴリ選択&検索
+    @Query("""
+    SELECT DISTINCT rc.restaurant FROM RestaurantCategory rc
+    WHERE rc.category.id IN :categoryIds
+    AND rc.restaurant.name LIKE :keyword
+    AND rc.restaurant.approved = false
+    ORDER BY rc.restaurant.createdAt DESC
+    """)
+    Page<Restaurant> findRestaurantsByCategoryIdsAndKeywordAndIsPublishedTure(
+            @Param("categoryIds") List<UUID> categoryIds,
+            @Param("keyword") String keyword,
+            Pageable pageable
+    );
+
+    //未公開&カテゴリ選択&検索
+    @Query("""
+    SELECT DISTINCT rc.restaurant FROM RestaurantCategory rc
+    WHERE rc.category.id IN :categoryIds
+    AND rc.restaurant.name LIKE :keyword
+    AND rc.restaurant.approved = false
+    ORDER BY rc.restaurant.createdAt DESC
+    """)
+    Page<Restaurant> findRestaurantsByCategoryIdsAndKeywordAndIsPublishedFalse(
+            @Param("categoryIds") List<UUID> categoryIds,
+            @Param("keyword") String keyword,
+            Pageable pageable
+    );
+
     List<RestaurantCategory> findByRestaurantId(UUID roomId);
 }
