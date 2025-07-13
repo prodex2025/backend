@@ -12,6 +12,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -177,5 +178,87 @@ public class TestController {
 
         return ResponseEntity.ok(dtoPage);
     }
+
+    //管理者承認済み
+    @GetMapping("/admin/true")
+    public ResponseEntity<?> findByApprovedTrue(@RequestParam(defaultValue = "0") int p) {
+        Page<Restaurant> restaurants = restaurantRepository.findByApprovedTrue(PageRequest.of(p, 10, Sort.by(Sort.Direction.DESC, "createdAt")));
+        Page<AdminRestaurantsDto> dtoPage = restaurants.map(restaurant -> {
+            return new AdminRestaurantsDto(
+                    restaurant.getId(),
+                    restaurant.getName(),
+                    restaurant.getIsPublished(),
+                    restaurant.getApplicationDate(),
+                    restaurant.getApprovalDate()
+            );
+        });
+                return ResponseEntity.ok(dtoPage);
+    }
+
+    //管理者承認済み
+    @GetMapping("/admin/false")
+    public ResponseEntity<?> findByApprovedFalse(@RequestParam(defaultValue = "0") int p) {
+        Page<Restaurant> restaurants = restaurantRepository.findByApprovedFalse(PageRequest.of(p, 10, Sort.by(Sort.Direction.DESC, "createdAt")));
+        Page<AdminRestaurantsDto> dtoPage = restaurants.map(restaurant -> {
+            return new AdminRestaurantsDto(
+                    restaurant.getId(),
+                    restaurant.getName(),
+                    restaurant.getIsPublished(),
+                    restaurant.getApplicationDate(),
+                    restaurant.getApprovalDate()
+            );
+        });
+        return ResponseEntity.ok(dtoPage);
+    }
+
+    //管理者承認済み
+    @GetMapping("/admin/is_published/true")
+    public ResponseEntity<?> findByIsPublishedTrue(@RequestParam(defaultValue = "0") int p) {
+        Page<Restaurant> restaurants = restaurantRepository.findByIsPublishedTrue(PageRequest.of(p, 10, Sort.by(Sort.Direction.DESC, "createdAt")));
+        Page<AdminRestaurantsDto> dtoPage = restaurants.map(restaurant -> {
+            return new AdminRestaurantsDto(
+                    restaurant.getId(),
+                    restaurant.getName(),
+                    restaurant.getIsPublished(),
+                    restaurant.getApplicationDate(),
+                    restaurant.getApprovalDate()
+            );
+        });
+        return ResponseEntity.ok(dtoPage);
+    }
+    //管理者承認済み
+    @GetMapping("/admin/is_published/false")
+    public ResponseEntity<?> findByIsPublishedFalse(@RequestParam(defaultValue = "0") int p) {
+        Page<Restaurant> restaurants = restaurantRepository.findByIsPublishedFalse(PageRequest.of(p, 10, Sort.by(Sort.Direction.DESC, "createdAt")));
+        Page<AdminRestaurantsDto> dtoPage = restaurants.map(restaurant -> {
+            return new AdminRestaurantsDto(
+                    restaurant.getId(),
+                    restaurant.getName(),
+                    restaurant.getIsPublished(),
+                    restaurant.getApplicationDate(),
+                    restaurant.getApprovalDate()
+            );
+        });
+        return ResponseEntity.ok(dtoPage);
+    }
+
+    //カテゴリ検索&承認済み
+    @GetMapping("/admin/category/keyword")
+    public ResponseEntity<?> TestAdmin(@RequestParam(defaultValue = "0") int p, @RequestParam List<UUID> categoryIds, @RequestParam String keyword) {
+        //SQLでLikeが扱えるように
+        String likeKeyword = "%" + keyword + "%";
+        Page<Restaurant> restaurants = restaurantCategoryRepository.findRestaurantsByCategoryIdsAndKeywordAndApprovedTure(categoryIds,likeKeyword, PageRequest.of(p, 10));
+        Page<AdminRestaurantsDto> dtoPage = restaurants.map(restaurant -> {
+             return  new AdminRestaurantsDto(
+                     restaurant.getId(),
+                     restaurant.getName(),
+                     restaurant.getIsPublished(),
+                     restaurant.getApplicationDate(),
+                     restaurant.getApprovalDate()
+             );
+        });
+        return ResponseEntity.ok(dtoPage);
+    }
+
 
 }

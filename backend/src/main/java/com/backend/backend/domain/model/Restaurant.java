@@ -57,8 +57,8 @@ public class Restaurant {
     @Column(name = "application_date")
     private Date applicationDate;
 
-    @Column(name = "application_date")
-    private Date approval_date;
+    @Column(name = "approval_date")
+    private Date approvalDate;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Timestamp createdAt;

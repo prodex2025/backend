@@ -17,5 +17,4 @@ public class AdminRestaurantsDto {
     private Boolean isPublished;
     private Date applicationDate;
     private Date approval_date;
-    private List<RestaurantCategoryDto> categoryDtoList;
 }
