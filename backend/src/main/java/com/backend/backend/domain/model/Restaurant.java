@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.Date;
 import java.util.UUID;
 
 @Entity
@@ -52,6 +53,12 @@ public class Restaurant {
 
     @Column(name = "is_published", nullable = false)
     private Boolean isPublished;
+
+    @Column(name = "application_date")
+    private Date applicationDate;
+
+    @Column(name = "application_date")
+    private Date approval_date;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Timestamp createdAt;
