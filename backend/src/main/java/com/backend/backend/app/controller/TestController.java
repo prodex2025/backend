@@ -39,6 +39,9 @@ public class TestController {
     @Autowired
     private DishAllergyRepository dishAllergyRepository;
 
+    @Autowired
+    private CategoryRepository categoryRepository;
+
     //店舗詳細
     @GetMapping("/{restaurantId}")
     public ResponseEntity<?> test(@PathVariable UUID restaurantId) {
@@ -260,5 +263,16 @@ public class TestController {
         return ResponseEntity.ok(dtoPage);
     }
 
+    @GetMapping("/category/all")
+    public ResponseEntity<?> CategoryAll() {
+        List<Category> categories = categoryRepository.findAll();
+        List<CategoryDto> categoryDtoList = categories.stream().map(category -> {
+            return new CategoryDto(
+                    category.getId(),
+                    category.getName()
+            );
+        }).toList();
+        return  ResponseEntity.ok(categoryDtoList);
+    }
 
 }
