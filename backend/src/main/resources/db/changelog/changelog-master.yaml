@@ -35,3 +35,5 @@ databaseChangeLog:
       file: db/changeLog/V3.7__restaurants_add_column.yaml
   - include:
       file: db/changeLog/V3.8__restaurants_add_column.yaml
+  - include:
+      file: db/changeLog/V3.9__restaurants_add_column.yaml
