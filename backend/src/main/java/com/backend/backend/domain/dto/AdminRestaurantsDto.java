@@ -16,5 +16,5 @@ public class AdminRestaurantsDto {
     private String name;
     private Boolean isPublished;
     private Date applicationDate;
-    private Date approval_date;
+    private Date approvalDate;
 }
