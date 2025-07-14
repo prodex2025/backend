@@ -51,3 +51,6 @@ databaseChangeLog:
                         - column:
                             name: interior_image_url
                             value: 'example.com'
+                        - column:
+                              name: certificate
+                              value: 'example.com'
