@@ -2,6 +2,8 @@ package com.backend.backend.app.controller;
 
 import com.backend.backend.domain.dto.OwnerRestaurantsDto;
 import com.backend.backend.domain.dto.RequestAddRestaurantDto;
+import com.backend.backend.domain.dto.RestaurantCategoryDetailDto;
+import com.backend.backend.domain.service.OwnerRestaurantDetailService;
 import com.backend.backend.domain.service.OwnerRestaurantService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -10,12 +12,17 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/owner")
 public class OwnerController {
 
     @Autowired
     private OwnerRestaurantService ownerRestaurantService;
+
+    @Autowired
+    private OwnerRestaurantDetailService ownerRestaurantDetailService;
 
     @GetMapping("/restaurants")
     public ResponseEntity<Page<OwnerRestaurantsDto>> getMyRestaurants(@AuthenticationPrincipal UserDetails userDetails, @RequestParam(defaultValue = "0")int p) {
@@ -33,4 +40,10 @@ public class OwnerController {
         return ResponseEntity.ok("登録完了");
     }
 
+    @GetMapping("/restaurants/{restaurantId}")
+    public ResponseEntity<RestaurantCategoryDetailDto> getMyRestaurantHeader(@AuthenticationPrincipal UserDetails userDetails, @PathVariable UUID restaurantId) {
+        //値を取得
+        RestaurantCategoryDetailDto restaurantDetailHeader = ownerRestaurantDetailService.getMyRestaurantHeader(userDetails, restaurantId);
+        return ResponseEntity.ok(restaurantDetailHeader);
+    }
 }

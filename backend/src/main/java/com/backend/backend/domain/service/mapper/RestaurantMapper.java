@@ -1,10 +1,9 @@
 package com.backend.backend.domain.service.mapper;
 
 import com.backend.backend.domain.dto.RequestAddRestaurantDto;
-import com.backend.backend.domain.model.Restaurant;
-import com.backend.backend.domain.model.RestaurantBusinessHours;
-import com.backend.backend.domain.model.RestaurantClosedDay;
-import com.backend.backend.domain.model.User;
+import com.backend.backend.domain.dto.RestaurantCategoryDetailDto;
+import com.backend.backend.domain.dto.RestaurantCategoryDto;
+import com.backend.backend.domain.model.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -56,6 +55,19 @@ public class RestaurantMapper {
                     return rbh;
                 })
                 .collect(Collectors.toList());
+    }
+
+    //店舗詳細ヘッダーDTOセット
+    public static RestaurantCategoryDetailDto toRestaurantDetailHeader(Restaurant restaurant, List<RestaurantCategory> restaurantCategory) {
+       //DTOにセット
+        RestaurantCategoryDetailDto restaurantCategoryDetailDto = new RestaurantCategoryDetailDto();
+        restaurantCategoryDetailDto.setRestaurantId(restaurant.getId());
+        restaurantCategoryDetailDto.setRestaurantName(restaurant.getName());
+        restaurantCategoryDetailDto.setRestaurantAddress(restaurant.getAddress());
+        restaurantCategoryDetailDto.setRestaurantPostCode(restaurant.getPostCode());
+        restaurantCategoryDetailDto.setCategoryDtoList(restaurantCategory.stream().map(RestaurantCategoryDto::fromEntity).toList());
+
+        return restaurantCategoryDetailDto;
     }
 
 }
