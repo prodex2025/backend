@@ -48,6 +48,9 @@ public class Restaurant {
     @Column(name = "interior_image_url", nullable = false)
     private String interiorImageUrl;
 
+    @Column(name = "certificate",nullable = false)
+    private String certificate;
+
     @Column(name = "approved", nullable = false)
     private Boolean approved;
 
@@ -70,6 +73,7 @@ public class Restaurant {
     protected void onCreate() {
         createdAt = Timestamp.from(Instant.now());
         updatedAt = Timestamp.from(Instant.now());
+        applicationDate = Date.from(Instant.now());
     }
 
     @PreUpdate
