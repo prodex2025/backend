@@ -7,6 +7,7 @@ import com.backend.backend.domain.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -22,6 +23,7 @@ public class RefreshTokenService {
     private RefreshTokenRepository refreshTokenRepository;
 
     //リフレッシュトークを保存
+    @Transactional
     public void saveRefreshToken(String refreshTokenStr, UserDetails userDetails) {
         //Userが存在するか
         User user = userRepository.findByLoginId(userDetails.getUsername()).orElseThrow(()-> new RuntimeException("Userが存在しません"));
