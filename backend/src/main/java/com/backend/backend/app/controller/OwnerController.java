@@ -2,6 +2,7 @@ package com.backend.backend.app.controller;
 
 import com.backend.backend.domain.dto.OwnerRestaurantsDto;
 import com.backend.backend.domain.dto.RequestAddRestaurantDto;
+import com.backend.backend.domain.dto.RequestEditRestaurantHeaderDto;
 import com.backend.backend.domain.dto.RestaurantCategoryDetailDto;
 import com.backend.backend.domain.service.OwnerRestaurantDetailService;
 import com.backend.backend.domain.service.OwnerRestaurantService;
@@ -45,5 +46,11 @@ public class OwnerController {
         //値を取得
         RestaurantCategoryDetailDto restaurantDetailHeader = ownerRestaurantDetailService.getMyRestaurantHeader(userDetails, restaurantId);
         return ResponseEntity.ok(restaurantDetailHeader);
+    }
+
+    @PutMapping("/restaurants/{restaurantId}")
+    public ResponseEntity<String> editRestaurantHeader(@AuthenticationPrincipal UserDetails userDetails, @PathVariable UUID restaurantId, @RequestBody RequestEditRestaurantHeaderDto requestDto) {
+        ownerRestaurantDetailService.editRestaurantHeader(userDetails, restaurantId, requestDto);
+        return ResponseEntity.ok("編集完了");
     }
 }

@@ -1,6 +1,7 @@
 package com.backend.backend.domain.service.mapper;
 
 import com.backend.backend.domain.dto.RequestAddRestaurantDto;
+import com.backend.backend.domain.dto.RequestEditRestaurantHeaderDto;
 import com.backend.backend.domain.dto.RestaurantCategoryDetailDto;
 import com.backend.backend.domain.dto.RestaurantCategoryDto;
 import com.backend.backend.domain.model.*;
@@ -68,6 +69,25 @@ public class RestaurantMapper {
         restaurantCategoryDetailDto.setCategoryDtoList(restaurantCategory.stream().map(RestaurantCategoryDto::fromEntity).toList());
 
         return restaurantCategoryDetailDto;
+    }
+
+    //店舗詳細ヘッダー編集
+    public static Restaurant toEditRestaurantDetailHeader(Restaurant restaurant, RequestEditRestaurantHeaderDto editRestaurant) {
+        //値をセット
+        restaurant.setName(editRestaurant.getRestaurantName());
+        restaurant.setAddress(editRestaurant.getRestaurantAddress());
+        restaurant.setPostCode(editRestaurant.getRestaurantPostCode());
+
+        return restaurant;
+    }
+
+    //店舗詳細ヘッダーカテゴリ編集
+    public static RestaurantCategory toEditRestaurantCategoryHeader(Restaurant restaurant, Category category) {
+        RestaurantCategory restaurantCategory = new RestaurantCategory();
+        restaurantCategory.setCategory(category);
+        restaurantCategory.setRestaurant(restaurant);
+
+        return restaurantCategory;
     }
 
 }

@@ -90,4 +90,6 @@ public interface RestaurantCategoryRepository extends JpaRepository<RestaurantCa
     );
 
     List<RestaurantCategory> findByRestaurantId(UUID restaurantId);
+
+    void deleteByRestaurant(Restaurant restaurant);
 }
