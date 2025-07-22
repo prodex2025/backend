@@ -53,4 +53,11 @@ public class OwnerController {
         ownerRestaurantDetailService.editRestaurantHeader(userDetails, restaurantId, requestDto);
         return ResponseEntity.ok("編集完了");
     }
+
+    @DeleteMapping("/restaurants/{restaurantId}")
+    public ResponseEntity<String> deleteRestaurant(@AuthenticationPrincipal UserDetails userDetails, @PathVariable UUID restaurantId) {
+        ownerRestaurantDetailService.deleteRestaurant(userDetails, restaurantId);
+        return ResponseEntity.ok("削除完了");
+    }
+
 }

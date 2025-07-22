@@ -86,4 +86,23 @@ public class OwnerRestaurantDetailService {
         restaurantCategoryRepository.saveAll(restaurantCategoryList);
     }
 
+    //店舗削除
+    @Transactional
+    public void deleteRestaurant(UserDetails userDetails, UUID restaurantId) {
+        //loginId取得
+        String loginId = userDetails.getUsername();
+
+        //店舗Idから店舗取得
+        Restaurant restaurant = restaurantRepository.findById(restaurantId)
+                .orElseThrow(()->new RuntimeException("店舗を取得できませんでした"));
+
+        //オーナー以外がアクセスした場合
+        if (loginId == null || !loginId.equals(restaurant.getUser().getLoginId())) {
+            throw new AccessDeniedException("この店舗にアクセスする権限がありません");
+        }
+        //店舗削除・中間テーブルの削除
+        restaurantRepository.delete(restaurant);
+        restaurantCategoryRepository.deleteByRestaurant(restaurant);
+    }
+
 }
