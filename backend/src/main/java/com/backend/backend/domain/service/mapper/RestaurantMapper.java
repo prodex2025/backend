@@ -77,6 +77,7 @@ public class RestaurantMapper {
         restaurant.setName(editRestaurant.getRestaurantName());
         restaurant.setAddress(editRestaurant.getRestaurantAddress());
         restaurant.setPostCode(editRestaurant.getRestaurantPostCode());
+        restaurant.setImageUrl(editRestaurant.getImageUrl());
 
         return restaurant;
     }

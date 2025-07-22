@@ -13,5 +13,6 @@ public class RequestEditRestaurantHeaderDto {
     private String restaurantName;
     private String restaurantAddress;
     private String restaurantPostCode;
+    private String imageUrl;
     private List<RestaurantCategoryDto> categoryDtoList;
 }
