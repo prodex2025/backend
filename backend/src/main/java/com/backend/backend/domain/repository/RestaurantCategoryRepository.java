@@ -89,5 +89,7 @@ public interface RestaurantCategoryRepository extends JpaRepository<RestaurantCa
             Pageable pageable
     );
 
-    List<RestaurantCategory> findByRestaurantId(UUID roomId);
+    List<RestaurantCategory> findByRestaurantId(UUID restaurantId);
+
+    void deleteByRestaurant(Restaurant restaurant);
 }
