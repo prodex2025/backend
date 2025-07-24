@@ -1,0 +1,15 @@
+databaseChangeLog:
+  - changeSet:
+      id: V4.0__add_on_delete_cascade
+      author: aki
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: dishes_allergies
+            constraintName: fk_dish_allergy
+        - addForeignKeyConstraint:
+            baseTableName: dishes_allergies
+            baseColumnNames: dish_id
+            referencedTableName: dishes
+            referencedColumnNames: id
+            constraintName: fk_dish_allergy
+            onDelete: CASCADE
