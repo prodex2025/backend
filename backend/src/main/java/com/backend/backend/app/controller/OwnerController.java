@@ -1,9 +1,7 @@
 package com.backend.backend.app.controller;
 
-import com.backend.backend.domain.dto.OwnerRestaurantsDto;
-import com.backend.backend.domain.dto.RequestAddRestaurantDto;
-import com.backend.backend.domain.dto.RequestEditRestaurantHeaderDto;
-import com.backend.backend.domain.dto.RestaurantCategoryDetailDto;
+import com.backend.backend.domain.dto.*;
+import com.backend.backend.domain.service.OwnerDishService;
 import com.backend.backend.domain.service.OwnerRestaurantDetailService;
 import com.backend.backend.domain.service.OwnerRestaurantService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +22,9 @@ public class OwnerController {
 
     @Autowired
     private OwnerRestaurantDetailService ownerRestaurantDetailService;
+
+    @Autowired
+    private OwnerDishService  ownerDishService;
 
     @GetMapping("/restaurants")
     public ResponseEntity<Page<OwnerRestaurantsDto>> getMyRestaurants(@AuthenticationPrincipal UserDetails userDetails, @RequestParam(defaultValue = "0")int p) {
@@ -58,6 +59,14 @@ public class OwnerController {
     public ResponseEntity<String> deleteRestaurant(@AuthenticationPrincipal UserDetails userDetails, @PathVariable UUID restaurantId) {
         ownerRestaurantDetailService.deleteRestaurant(userDetails, restaurantId);
         return ResponseEntity.ok("削除完了");
+    }
+
+    @GetMapping("/restaurants/{restaurantId}/menus")
+    public ResponseEntity<Page<DishesListDto>> getDishes(@AuthenticationPrincipal UserDetails userDetails,
+                                                         @PathVariable UUID restaurantId,
+                                                         @RequestParam(name = "page", defaultValue = "0") int page) {
+        Page<DishesListDto> dishes = ownerDishService.getDishes(userDetails, restaurantId, page);
+        return ResponseEntity.ok(dishes);
     }
 
 }
