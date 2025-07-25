@@ -4,6 +4,7 @@ import com.backend.backend.domain.dto.*;
 import com.backend.backend.domain.service.OwnerDishService;
 import com.backend.backend.domain.service.OwnerRestaurantDetailService;
 import com.backend.backend.domain.service.OwnerRestaurantService;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -67,6 +68,15 @@ public class OwnerController {
                                                          @RequestParam(name = "page", defaultValue = "0") int page) {
         Page<DishesListDto> dishes = ownerDishService.getDishes(userDetails, restaurantId, page);
         return ResponseEntity.ok(dishes);
+    }
+
+    @PostMapping("/restaurants/{restaurantId}/menus")
+    public ResponseEntity<String> addDish(@AuthenticationPrincipal UserDetails userDetails,
+                                                  @PathVariable UUID restaurantId,
+                                                  @RequestBody RequestDishDto dto) {
+        ownerDishService.addDish(userDetails, restaurantId, dto);
+
+        return ResponseEntity.ok("登録成功");
     }
 
 }
