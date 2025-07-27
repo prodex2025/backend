@@ -92,7 +92,7 @@ public class RestaurantMapper {
     }
 
     //店舗一覧DTO返却
-    public static RestaurantCategoryDetailDto toGetRestaurantList(List<RestaurantCategory> categories, Restaurant restaurant) {
+    public static RestaurantCategoryDetailDto toRestaurantCategoryDetailDto(List<RestaurantCategory> categories, Restaurant restaurant) {
         // カテゴリEntityをDTOに変換
         List<RestaurantCategoryDto> categoryList = categories.stream()
                 .map(RestaurantCategoryDto::fromEntity)

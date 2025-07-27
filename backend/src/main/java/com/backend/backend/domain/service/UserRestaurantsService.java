@@ -15,31 +15,36 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 
 @Service
 public class UserRestaurantsService {
-    @Autowired
-    private RestaurantCategoryRepository restaurantCategoryRepository;
-    @Autowired
-    private RestaurantRepository restaurantRepository;
+    private final RestaurantCategoryRepository restaurantCategoryRepository;
+    private final RestaurantRepository restaurantRepository;
+
+    public UserRestaurantsService(RestaurantCategoryRepository restaurantCategoryRepository, RestaurantRepository restaurantRepository) {
+        this.restaurantCategoryRepository = restaurantCategoryRepository;
+        this.restaurantRepository = restaurantRepository;
+    }
+
+    private static final int DEFAULT_PAGE_SIZE = 10;
 
     // 店舗一覧取得
-    public Page<RestaurantCategoryDetailDto> getAllRestaurants(int p, String keyword, List<UUID> categoryIds) {
-        Pageable pageable = PageRequest.of(p, 10);
+    public Page<RestaurantCategoryDetailDto> getAllRestaurants(int page, String keyword, List<UUID> categoryIds) {
+        Pageable pageable = PageRequest.of(page, DEFAULT_PAGE_SIZE);
         Page<Restaurant> restaurants;
 
         if (keyword != null && !keyword.isBlank() && categoryIds != null && !categoryIds.isEmpty()) {
             String likeKeyword = "%" + keyword + "%";
             restaurants = restaurantCategoryRepository.findRestaurantsByCategoryIdsAndKeywordAndIsPublishedTure(categoryIds, likeKeyword, pageable);
         } else if (categoryIds != null && !categoryIds.isEmpty()) {
-            restaurants = restaurantCategoryRepository.findRestaurantsByCategoryIdsAndIsPublishedTure(categoryIds, pageable);
+            restaurants = restaurantCategoryRepository.findRestaurantsByCategoryIdsAndIsPublishedTrue(categoryIds, pageable);
         } else if (keyword != null && !keyword.isBlank()) {
-            pageable = PageRequest.of(p, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
             restaurants = restaurantRepository.findByIsPublishedTrueAndNameContaining(pageable, keyword);
         } else {
-            pageable = PageRequest.of(p, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
             restaurants = restaurantRepository.findByIsPublishedTrue(pageable);
         }
 
@@ -47,10 +52,22 @@ public class UserRestaurantsService {
     }
 
     private Page<RestaurantCategoryDetailDto> toDtoPage(Page<Restaurant> restaurants) {
+        List<UUID> restaurantIds = restaurants
+                .stream()
+                .map(Restaurant::getId)
+                .toList();
+
+        List<RestaurantCategory> allCategories = restaurantCategoryRepository.findByRestaurantIdIn(restaurantIds);
+
+        // Map<restaurantId, List<RestaurantCategory>> に変換
+        Map<UUID, List<RestaurantCategory>> categoryMap = allCategories.stream()
+                .collect(Collectors.groupingBy(rc -> rc.getRestaurant().getId()));
+
         return restaurants.map(restaurant -> {
-            List<RestaurantCategory> categories = restaurantCategoryRepository.findByRestaurantId(restaurant.getId());
-            return RestaurantMapper.toGetRestaurantList(categories, restaurant);
+            List<RestaurantCategory> categories = categoryMap.getOrDefault(restaurant.getId(), List.of());
+            return RestaurantMapper.toRestaurantCategoryDetailDto(categories, restaurant);
         });
     }
+
 }
 
