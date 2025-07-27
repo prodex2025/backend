@@ -42,6 +42,8 @@ public class OwnerDishService {
         this.dishAllergyRepository = dishAllergyRepository;
     }
 
+    private static final int DEFAULT_PAGE_SIZE = 10;
+
     //店舗のメニュー取得
     public Page<DishesListDto> getDishes(UserDetails userDetails, UUID restaurantId, int page) {
         // loginIdを取得
@@ -55,7 +57,7 @@ public class OwnerDishService {
         validateOwner(loginId, restaurant);
 
         // ページングしてDishを取得
-        Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Pageable pageable = PageRequest.of(page, DEFAULT_PAGE_SIZE, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Dish> dishes = dishRepository.findByRestaurantId(pageable, restaurantId);
 
         return DishMapper.toDishesListDtoPage(dishes);
@@ -115,6 +117,22 @@ public class OwnerDishService {
 
         // アレルギー情報の更新
         updateDishAllergies(dish, dto.getAllergyDtoList());
+    }
+
+    // メニュー削除
+    public void deleteDish(UserDetails userDetails, UUID restaurantId, UUID dishId) {
+        // loginIdを取得
+        String loginId = userDetails.getUsername();
+
+        // 店舗取得（存在チェック）
+        Restaurant restaurant = restaurantRepository.findById(restaurantId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "店舗が存在しません"));
+
+        // 認証チェック
+        validateOwner(loginId, restaurant);
+
+        // 料理削除
+        dishRepository.deleteById(dishId);
     }
 
     // 認証チェック

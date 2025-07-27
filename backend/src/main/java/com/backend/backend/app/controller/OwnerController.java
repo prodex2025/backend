@@ -18,20 +18,25 @@ import java.util.UUID;
 @RequestMapping("/api/owner")
 public class OwnerController {
 
-    @Autowired
-    private OwnerRestaurantService ownerRestaurantService;
+    private final OwnerRestaurantService ownerRestaurantService;
+    private final OwnerRestaurantDetailService ownerRestaurantDetailService;
+    private final OwnerDishService ownerDishService;
 
-    @Autowired
-    private OwnerRestaurantDetailService ownerRestaurantDetailService;
-
-    @Autowired
-    private OwnerDishService  ownerDishService;
+    public OwnerController (
+            OwnerRestaurantService ownerRestaurantService,
+            OwnerRestaurantDetailService ownerRestaurantDetailService,
+            OwnerDishService ownerDishService
+    ) {
+        this.ownerRestaurantService = ownerRestaurantService;
+        this.ownerRestaurantDetailService = ownerRestaurantDetailService;
+        this.ownerDishService = ownerDishService;
+    }
 
     @GetMapping("/restaurants")
-    public ResponseEntity<Page<OwnerRestaurantsDto>> getMyRestaurants(@AuthenticationPrincipal UserDetails userDetails, @RequestParam(defaultValue = "0")int p) {
+    public ResponseEntity<Page<OwnerRestaurantsDto>> getMyRestaurants(@AuthenticationPrincipal UserDetails userDetails, @RequestParam(defaultValue = "0")int page) {
         //loginId取得
         String loginId = userDetails.getUsername();
-        Page<OwnerRestaurantsDto> dtoPage = ownerRestaurantService.getMyRestaurants(loginId, p);
+        Page<OwnerRestaurantsDto> dtoPage = ownerRestaurantService.getMyRestaurants(loginId, page);
         return ResponseEntity.ok(dtoPage);
     }
 
@@ -87,6 +92,15 @@ public class OwnerController {
         ownerDishService.editDish(userDetails, restaurantId, menuId, dto);
 
         return ResponseEntity.ok("編集成功");
+    }
+
+    @DeleteMapping("/restaurants/{restaurantId}/menus/{menuId}")
+    public ResponseEntity<String> deleteDish(@AuthenticationPrincipal UserDetails userDetails,
+                                             @PathVariable UUID restaurantId,
+                                             @PathVariable UUID menuId) {
+        ownerDishService.deleteDish(userDetails, restaurantId, menuId);
+
+        return ResponseEntity.ok("削除完了");
     }
 
 }
