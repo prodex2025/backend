@@ -66,7 +66,7 @@ public interface RestaurantCategoryRepository extends JpaRepository<RestaurantCa
     SELECT DISTINCT rc.restaurant FROM RestaurantCategory rc
     WHERE rc.category.id IN :categoryIds
     AND rc.restaurant.name LIKE :keyword
-    AND rc.restaurant.approved = false
+    AND rc.restaurant.approved = true
     ORDER BY rc.restaurant.createdAt DESC
     """)
     Page<Restaurant> findRestaurantsByCategoryIdsAndKeywordAndIsPublishedTure(
@@ -86,6 +86,18 @@ public interface RestaurantCategoryRepository extends JpaRepository<RestaurantCa
     Page<Restaurant> findRestaurantsByCategoryIdsAndKeywordAndIsPublishedFalse(
             @Param("categoryIds") List<UUID> categoryIds,
             @Param("keyword") String keyword,
+            Pageable pageable
+    );
+
+    //公開&カテゴリー検索
+    @Query("""
+    SELECT DISTINCT rc.restaurant FROM RestaurantCategory rc
+    WHERE rc.category.id IN :categoryIds
+    AND rc.restaurant.approved = true
+    ORDER BY rc.restaurant.createdAt DESC
+    """)
+    Page<Restaurant> findRestaurantsByCategoryIdsAndIsPublishedTure(
+            @Param("categoryIds") List<UUID> categoryIds,
             Pageable pageable
     );
 

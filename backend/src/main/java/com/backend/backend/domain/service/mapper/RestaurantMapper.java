@@ -91,4 +91,21 @@ public class RestaurantMapper {
         return restaurantCategory;
     }
 
+    //店舗一覧DTO返却
+    public static RestaurantCategoryDetailDto toGetRestaurantList(List<RestaurantCategory> categories, Restaurant restaurant) {
+        // カテゴリEntityをDTOに変換
+        List<RestaurantCategoryDto> categoryList = categories.stream()
+                .map(RestaurantCategoryDto::fromEntity)
+                .toList();
+
+        // 店舗情報とカテゴリをDTOにまとめる
+        return new RestaurantCategoryDetailDto(
+                restaurant.getId(),
+                restaurant.getName(),
+                restaurant.getAddress(),
+                restaurant.getPostCode(),
+                categoryList
+        );
+    }
+
 }

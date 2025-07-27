@@ -42,4 +42,5 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, UUID> {
     //経営者登録店舗一覧
     Page<Restaurant> findByUserId(Pageable pageable, UUID userId);
 
+
 }
