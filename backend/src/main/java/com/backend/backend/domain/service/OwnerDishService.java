@@ -9,8 +9,6 @@ import com.backend.backend.domain.model.DishAllergy;
 import com.backend.backend.domain.model.Restaurant;
 import com.backend.backend.domain.repository.*;
 import com.backend.backend.domain.service.mapper.DishMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,23 +22,25 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
 public class OwnerDishService {
 
-    @Autowired
-    private DishRepository dishRepository;
+    private final DishRepository dishRepository;
+    private final RestaurantRepository restaurantRepository;
+    private final AllergyRepository allergyRepository;
+    private final DishAllergyRepository dishAllergyRepository;
 
-    @Autowired
-    private RestaurantRepository restaurantRepository;
-
-    @Autowired
-    private AllergyRepository allergyRepository;
-
-    @Autowired
-    private DishAllergyRepository dishAllergyRepository;
+    public OwnerDishService(DishRepository dishRepository,
+                            RestaurantRepository restaurantRepository,
+                            AllergyRepository allergyRepository,
+                            DishAllergyRepository dishAllergyRepository) {
+        this.dishRepository = dishRepository;
+        this.restaurantRepository = restaurantRepository;
+        this.allergyRepository = allergyRepository;
+        this.dishAllergyRepository = dishAllergyRepository;
+    }
 
     //店舗のメニュー取得
     public Page<DishesListDto> getDishes(UserDetails userDetails, UUID restaurantId, int page) {
@@ -89,6 +89,34 @@ public class OwnerDishService {
         dishAllergyRepository.saveAll(dishAllergyList);
     }
 
+    // 店舗メニュー編集
+    @Transactional
+    public void editDish(UserDetails userDetails, UUID restaurantId, UUID dishId, RequestDishDto dto) {
+        // dtoチェック
+        if (dto == null) {
+            throw new IllegalArgumentException("料理情報が指定されていません");
+        }
+        // loginIdを取得
+        String loginId = userDetails.getUsername();
+
+        // 店舗取得（存在チェック）
+        Restaurant restaurant = restaurantRepository.findById(restaurantId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "店舗が存在しません"));
+
+        // 認証チェック
+        validateOwner(loginId, restaurant);
+
+        // 編集する料理を取得
+        Dish dish = dishRepository.findById(dishId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "料理が存在しません"));
+
+        // 料理情報更新
+        updateDishInfo(dish, dto);
+
+        // アレルギー情報の更新
+        updateDishAllergies(dish, dto.getAllergyDtoList());
+    }
+
     // 認証チェック
     private void validateOwner(String loginId, Restaurant restaurant) {
         // nullチェックを追加
@@ -128,6 +156,38 @@ public class OwnerDishService {
         return allergies.stream()
                 .map(allergy -> DishMapper.toDishAllergy(dish, allergy))
                 .toList();
+    }
+
+    // 料理の基本情報を更新
+    private void updateDishInfo(Dish dish, RequestDishDto dto) {
+        try {
+            Dish editedDish = DishMapper.setEditValues(dish, dto);
+            dishRepository.save(editedDish);
+
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "料理情報の更新に失敗しました", e);
+        }
+    }
+
+    // 料理・アレルギー情報を更新
+    private void updateDishAllergies(Dish dish, List<AllergyDto> allergyDtoList) {
+        try {
+            // 新しいアレルギー情報を作成
+            List<DishAllergy> newDishAllergyList = createDishAllergies(dish, allergyDtoList);
+
+            // 既存のアレルギー情報を削除
+            dishAllergyRepository.deleteByDish(dish);
+
+            // 新しいアレルギー情報を登録
+            if (!newDishAllergyList.isEmpty()) {
+                dishAllergyRepository.saveAll(newDishAllergyList);
+            }
+
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "アレルギー情報の更新に失敗しました", e);
+        }
     }
 
 }

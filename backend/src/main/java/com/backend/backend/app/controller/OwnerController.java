@@ -79,4 +79,14 @@ public class OwnerController {
         return ResponseEntity.ok("登録成功");
     }
 
+    @PutMapping("/restaurants/{restaurantId}/menus/{menuId}")
+    public ResponseEntity<String> editDish(@AuthenticationPrincipal UserDetails userDetails,
+                                           @PathVariable UUID restaurantId,
+                                           @PathVariable UUID menuId,
+                                           @RequestBody RequestDishDto dto) {
+        ownerDishService.editDish(userDetails, restaurantId, menuId, dto);
+
+        return ResponseEntity.ok("編集成功");
+    }
+
 }
