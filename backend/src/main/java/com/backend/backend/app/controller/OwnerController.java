@@ -7,6 +7,7 @@ import com.backend.backend.domain.service.OwnerRestaurantService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -91,7 +92,7 @@ public class OwnerController {
                                            @RequestBody RequestDishDto dto) {
         ownerDishService.editDish(userDetails, restaurantId, menuId, dto);
 
-        return ResponseEntity.ok("編集成功");
+        return ResponseEntity.status(HttpStatus.CREATED).body("登録成功");
     }
 
     @DeleteMapping("/restaurants/{restaurantId}/menus/{menuId}")
@@ -100,7 +101,7 @@ public class OwnerController {
                                              @PathVariable UUID menuId) {
         ownerDishService.deleteDish(userDetails, restaurantId, menuId);
 
-        return ResponseEntity.ok("削除完了");
+        return ResponseEntity.noContent().build();
     }
 
 }

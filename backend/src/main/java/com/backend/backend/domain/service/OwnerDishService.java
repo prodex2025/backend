@@ -103,14 +103,14 @@ public class OwnerDishService {
 
         // 店舗取得（存在チェック）
         Restaurant restaurant = restaurantRepository.findById(restaurantId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "店舗が存在しません"));
+                .orElseThrow(() -> new RuntimeException("店舗が存在しません"));
 
         // 認証チェック
         validateOwner(loginId, restaurant);
 
         // 編集する料理を取得
         Dish dish = dishRepository.findById(dishId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "料理が存在しません"));
+                .orElseThrow(() -> new RuntimeException("料理を取得できませんでした"));
 
         // 料理情報更新
         updateDishInfo(dish, dto);
@@ -126,10 +126,22 @@ public class OwnerDishService {
 
         // 店舗取得（存在チェック）
         Restaurant restaurant = restaurantRepository.findById(restaurantId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "店舗が存在しません"));
+                .orElseThrow(() -> new RuntimeException("店舗を取得できませんでした"));
 
         // 認証チェック
         validateOwner(loginId, restaurant);
+
+        // 料理取得
+        Dish dish = dishRepository.findById(dishId)
+                .orElseThrow(() -> new RuntimeException("料理が存在しません"));
+
+        // 料理が店舗に属しているかチェック
+        if (!dish.getRestaurant().getId().equals(restaurantId)) {
+            throw new AccessDeniedException("この料理を削除する権限がありません");
+        }
+
+        // 関連するアレルギー情報を削除
+        dishAllergyRepository.deleteByDish(dish);
 
         // 料理削除
         dishRepository.deleteById(dishId);
@@ -178,19 +190,12 @@ public class OwnerDishService {
 
     // 料理の基本情報を更新
     private void updateDishInfo(Dish dish, RequestDishDto dto) {
-        try {
             Dish editedDish = DishMapper.setEditValues(dish, dto);
             dishRepository.save(editedDish);
-
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
-                    "料理情報の更新に失敗しました", e);
-        }
     }
 
     // 料理・アレルギー情報を更新
     private void updateDishAllergies(Dish dish, List<AllergyDto> allergyDtoList) {
-        try {
             // 新しいアレルギー情報を作成
             List<DishAllergy> newDishAllergyList = createDishAllergies(dish, allergyDtoList);
 
@@ -201,11 +206,6 @@ public class OwnerDishService {
             if (!newDishAllergyList.isEmpty()) {
                 dishAllergyRepository.saveAll(newDishAllergyList);
             }
-
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
-                    "アレルギー情報の更新に失敗しました", e);
-        }
     }
 
 }
