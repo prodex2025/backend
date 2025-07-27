@@ -1,13 +1,13 @@
 package com.backend.backend.app.controller;
 
-import com.backend.backend.domain.dto.OwnerRestaurantsDto;
-import com.backend.backend.domain.dto.RequestAddRestaurantDto;
-import com.backend.backend.domain.dto.RequestEditRestaurantHeaderDto;
-import com.backend.backend.domain.dto.RestaurantCategoryDetailDto;
+import com.backend.backend.domain.dto.*;
+import com.backend.backend.domain.service.OwnerDishService;
 import com.backend.backend.domain.service.OwnerRestaurantDetailService;
 import com.backend.backend.domain.service.OwnerRestaurantService;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,17 +19,25 @@ import java.util.UUID;
 @RequestMapping("/api/owner")
 public class OwnerController {
 
-    @Autowired
-    private OwnerRestaurantService ownerRestaurantService;
+    private final OwnerRestaurantService ownerRestaurantService;
+    private final OwnerRestaurantDetailService ownerRestaurantDetailService;
+    private final OwnerDishService ownerDishService;
 
-    @Autowired
-    private OwnerRestaurantDetailService ownerRestaurantDetailService;
+    public OwnerController (
+            OwnerRestaurantService ownerRestaurantService,
+            OwnerRestaurantDetailService ownerRestaurantDetailService,
+            OwnerDishService ownerDishService
+    ) {
+        this.ownerRestaurantService = ownerRestaurantService;
+        this.ownerRestaurantDetailService = ownerRestaurantDetailService;
+        this.ownerDishService = ownerDishService;
+    }
 
     @GetMapping("/restaurants")
-    public ResponseEntity<Page<OwnerRestaurantsDto>> getMyRestaurants(@AuthenticationPrincipal UserDetails userDetails, @RequestParam(defaultValue = "0")int p) {
+    public ResponseEntity<Page<OwnerRestaurantsDto>> getMyRestaurants(@AuthenticationPrincipal UserDetails userDetails, @RequestParam(defaultValue = "0")int page) {
         //loginId取得
         String loginId = userDetails.getUsername();
-        Page<OwnerRestaurantsDto> dtoPage = ownerRestaurantService.getMyRestaurants(loginId, p);
+        Page<OwnerRestaurantsDto> dtoPage = ownerRestaurantService.getMyRestaurants(loginId, page);
         return ResponseEntity.ok(dtoPage);
     }
 
@@ -58,6 +66,42 @@ public class OwnerController {
     public ResponseEntity<String> deleteRestaurant(@AuthenticationPrincipal UserDetails userDetails, @PathVariable UUID restaurantId) {
         ownerRestaurantDetailService.deleteRestaurant(userDetails, restaurantId);
         return ResponseEntity.ok("削除完了");
+    }
+
+    @GetMapping("/restaurants/{restaurantId}/menus")
+    public ResponseEntity<Page<DishesListDto>> getDishes(@AuthenticationPrincipal UserDetails userDetails,
+                                                         @PathVariable UUID restaurantId,
+                                                         @RequestParam(name = "page", defaultValue = "0") int page) {
+        Page<DishesListDto> dishes = ownerDishService.getDishes(userDetails, restaurantId, page);
+        return ResponseEntity.ok(dishes);
+    }
+
+    @PostMapping("/restaurants/{restaurantId}/menus")
+    public ResponseEntity<String> addDish(@AuthenticationPrincipal UserDetails userDetails,
+                                                  @PathVariable UUID restaurantId,
+                                                  @RequestBody RequestDishDto dto) {
+        ownerDishService.addDish(userDetails, restaurantId, dto);
+
+        return ResponseEntity.ok("登録成功");
+    }
+
+    @PutMapping("/restaurants/{restaurantId}/menus/{menuId}")
+    public ResponseEntity<String> editDish(@AuthenticationPrincipal UserDetails userDetails,
+                                           @PathVariable UUID restaurantId,
+                                           @PathVariable UUID menuId,
+                                           @RequestBody RequestDishDto dto) {
+        ownerDishService.editDish(userDetails, restaurantId, menuId, dto);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body("登録成功");
+    }
+
+    @DeleteMapping("/restaurants/{restaurantId}/menus/{menuId}")
+    public ResponseEntity<String> deleteDish(@AuthenticationPrincipal UserDetails userDetails,
+                                             @PathVariable UUID restaurantId,
+                                             @PathVariable UUID menuId) {
+        ownerDishService.deleteDish(userDetails, restaurantId, menuId);
+
+        return ResponseEntity.noContent().build();
     }
 
 }
