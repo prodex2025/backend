@@ -1,17 +1,14 @@
 package com.backend.backend.domain.service;
 
 import com.backend.backend.domain.dto.RestaurantCategoryDetailDto;
-import com.backend.backend.domain.dto.RestaurantCategoryDto;
 import com.backend.backend.domain.model.Restaurant;
 import com.backend.backend.domain.model.RestaurantCategory;
 import com.backend.backend.domain.repository.RestaurantCategoryRepository;
 import com.backend.backend.domain.repository.RestaurantRepository;
 import com.backend.backend.domain.service.mapper.RestaurantMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -49,6 +46,17 @@ public class UserRestaurantsService {
         }
 
         return toDtoPage(restaurants);
+    }
+
+    public RestaurantCategoryDetailDto getRestaurantDetail(UUID restaurantId){
+        Restaurant restaurant = restaurantRepository.findById(restaurantId)
+                .orElseThrow(()->new RuntimeException("店舗を取得できませんでした"));
+
+        //中間テーブルの取得
+        List<RestaurantCategory> restaurantCategoryList = restaurantCategoryRepository.findByRestaurantId(restaurantId);
+
+        //DTOに変換したデータを取得して、値を返す
+        return RestaurantMapper.toRestaurantDetailHeader(restaurant, restaurantCategoryList);
     }
 
     private Page<RestaurantCategoryDetailDto> toDtoPage(Page<Restaurant> restaurants) {
