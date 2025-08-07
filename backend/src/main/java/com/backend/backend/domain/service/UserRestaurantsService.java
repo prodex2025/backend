@@ -1,22 +1,18 @@
 package com.backend.backend.domain.service;
 
 import com.backend.backend.domain.dto.RestaurantCategoryDetailDto;
-import com.backend.backend.domain.dto.RestaurantCategoryDto;
 import com.backend.backend.domain.model.Restaurant;
 import com.backend.backend.domain.model.RestaurantCategory;
 import com.backend.backend.domain.repository.RestaurantCategoryRepository;
 import com.backend.backend.domain.repository.RestaurantRepository;
 import com.backend.backend.domain.service.mapper.RestaurantMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
