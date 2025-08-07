@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -49,6 +50,17 @@ public class UserRestaurantsService {
         }
 
         return toDtoPage(restaurants);
+    }
+
+    public RestaurantCategoryDetailDto getRestaurantDetail(UUID restaurantId){
+        Restaurant restaurant = restaurantRepository.findById(restaurantId)
+                .orElseThrow(()->new RuntimeException("店舗を取得できませんでした"));
+
+        //中間テーブルの取得
+        List<RestaurantCategory> restaurantCategoryList = restaurantCategoryRepository.findByRestaurantId(restaurantId);
+
+        //DTOに変換したデータを取得して、値を返す
+        return RestaurantMapper.toRestaurantDetailHeader(restaurant, restaurantCategoryList);
     }
 
     private Page<RestaurantCategoryDetailDto> toDtoPage(Page<Restaurant> restaurants) {
