@@ -39,3 +39,5 @@ databaseChangeLog:
       file: db/changeLog/V3.9__restaurants_add_column.yaml
   - include:
       file: db/changeLog/V4.0__add_on_delete_cascade.yaml
+  - include:
+      file: db/changeLog/V4.1__store_schedule.yaml
