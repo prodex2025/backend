@@ -30,32 +30,24 @@ public class RestaurantMapper {
         return restaurant;
     }
 
-    //定休日
-    public static List<RestaurantClosedDay> toClosedDays(RequestAddRestaurantDto dto, Restaurant restaurant) {
-        return Optional.ofNullable(dto.getClosedDayDtoList())
+    //定休日・営業時間
+    public static List<StoreSchedule> toStoreSchedule(RequestAddRestaurantDto dto, Restaurant restaurant) {
+        return Optional.ofNullable(dto.getStoreScheduleDtoList())
                 .orElse(Collections.emptyList()).stream()
-                .map(closedDay -> {
-                    RestaurantClosedDay rcd = new RestaurantClosedDay();
-                    rcd.setRestaurant(restaurant);
-                    rcd.setDayOfWeek(closedDay.getDayOfWeek());
-                    return rcd;
+                .map(storeScheduleDto -> {
+                    StoreSchedule storeSchedule = new StoreSchedule();
+                    storeSchedule.setRestaurant(restaurant);
+                    storeSchedule.setDayOfWeek(storeScheduleDto.getDayOfWeek());
+                    storeSchedule.setIsClosed(storeScheduleDto.getIsClosed());
+                    storeSchedule.setLunchStart(storeScheduleDto.getLunchStart());
+                    storeSchedule.setLunchEnd(storeScheduleDto.getLunchEnd());
+                    storeSchedule.setIsLunchClosed(storeScheduleDto.getIsLunchClosed());
+                    storeSchedule.setDinnerStart(storeScheduleDto.getDinnerStart());
+                    storeSchedule.setDinnerEnd(storeScheduleDto.getDinnerEnd());
+                    storeSchedule.setIsDinnerClosed(storeScheduleDto.getIsDinnerClosed());
+                    return storeSchedule;
                 })
-                .collect(Collectors.toList());
-    }
-
-    //営業時間
-    public static List<RestaurantBusinessHours> toBusinessHours(RequestAddRestaurantDto dto, Restaurant restaurant) {
-        return Optional.ofNullable(dto.getBusinessHoursDtoList())
-                .orElse(Collections.emptyList()).stream()
-                .map(hours -> {
-                    RestaurantBusinessHours rbh = new RestaurantBusinessHours();
-                    rbh.setRestaurant(restaurant);
-                    rbh.setDayOfWeek(hours.getDayOfWeek());
-                    rbh.setOpenTime(hours.getOpenTime());
-                    rbh.setCloseTime(hours.getCloseTime());
-                    return rbh;
-                })
-                .collect(Collectors.toList());
+                .toList();
     }
 
     //店舗詳細ヘッダーDTOセット

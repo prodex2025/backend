@@ -19,20 +19,21 @@ import java.util.List;
 
 @Service
 public class OwnerRestaurantService {
-    @Autowired
-    private UserRepository userRepository;
 
-    @Autowired
-    private RestaurantRepository restaurantRepository;
+    private final UserRepository userRepository;
+    private final RestaurantRepository restaurantRepository;
+    private final RestaurantCategoryRepository restaurantCategoryRepository;
+    private final StoreScheduleRepository storeScheduleRepository;
 
-    @Autowired
-    private RestaurantCategoryRepository restaurantCategoryRepository;
-
-    @Autowired
-    private RestaurantClosedDayRepository restaurantClosedDayRepository;
-
-    @Autowired
-    private RestaurantBusinessHoursRepository restaurantBusinessHoursRepository;
+    public OwnerRestaurantService(UserRepository userRepository,
+                                  RestaurantRepository restaurantRepository,
+                                  RestaurantCategoryRepository restaurantCategoryRepository,
+                                  StoreScheduleRepository storeScheduleRepository) {
+        this.userRepository = userRepository;
+        this.restaurantRepository = restaurantRepository;
+        this.restaurantCategoryRepository = restaurantCategoryRepository;
+        this.storeScheduleRepository = storeScheduleRepository;
+    }
 
     //店舗一覧を取得
     public Page<OwnerRestaurantsDto> getMyRestaurants(String loginId, int page) {
@@ -77,14 +78,9 @@ public class OwnerRestaurantService {
         Restaurant restaurant = RestaurantMapper.toRestaurant(restaurantDto, user);
         Restaurant addRestaurant = restaurantRepository.save(restaurant);
 
-        //定休日登録
-        List<RestaurantClosedDay> closedDays = RestaurantMapper.toClosedDays(restaurantDto, addRestaurant);
-        restaurantClosedDayRepository.saveAll(closedDays);
-
-        //営業時間登録
-        List<RestaurantBusinessHours> businessHours = RestaurantMapper.toBusinessHours(restaurantDto, addRestaurant);
-        restaurantBusinessHoursRepository.saveAll(businessHours);
-
+        //定休日・営業時間の登録
+        List<StoreSchedule> storeSchedules = RestaurantMapper.toStoreSchedule(restaurantDto, addRestaurant);
+        storeScheduleRepository.saveAll(storeSchedules);
     }
 
 }

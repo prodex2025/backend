@@ -18,7 +18,6 @@ public class RequestAddRestaurantDto {
     private String imageUrl;
     private String interiorImageUrl;
     private String certificate;
-    private List<ClosedDayDto> closedDayDtoList;
-    private List<BusinessHoursDto> businessHoursDtoList;
+    private List<StoreScheduleDto> storeScheduleDtoList;
     private List<CategoryDto> categoryDtoList;
 }
