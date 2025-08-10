@@ -1,9 +1,6 @@
 package com.backend.backend.domain.dto;
 
-import com.backend.backend.domain.model.Restaurant;
-import com.backend.backend.domain.model.RestaurantClosedDay;
 import com.backend.backend.domain.model.StoreSchedule;
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
