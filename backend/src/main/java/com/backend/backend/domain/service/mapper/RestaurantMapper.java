@@ -9,7 +9,6 @@ import com.backend.backend.domain.model.*;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class RestaurantMapper {
     //店舗登録

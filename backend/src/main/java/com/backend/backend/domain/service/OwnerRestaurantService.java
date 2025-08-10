@@ -6,7 +6,6 @@ import com.backend.backend.domain.dto.RestaurantCategoryDto;
 import com.backend.backend.domain.model.*;
 import com.backend.backend.domain.repository.*;
 import com.backend.backend.domain.service.mapper.RestaurantMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
