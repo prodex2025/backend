@@ -4,8 +4,6 @@ import com.backend.backend.domain.dto.*;
 import com.backend.backend.domain.service.OwnerDishService;
 import com.backend.backend.domain.service.OwnerRestaurantDetailService;
 import com.backend.backend.domain.service.OwnerRestaurantService;
-import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
