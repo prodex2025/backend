@@ -66,6 +66,11 @@ public class OwnerController {
         return ResponseEntity.ok("削除完了");
     }
 
+    @GetMapping("/restaurants/{restaurantId}/profile")
+    public ResponseEntity<RestaurantDetailDto> getRestaurantDetail(@AuthenticationPrincipal UserDetails userDetails, @PathVariable UUID restaurantId) {
+        return ResponseEntity.ok(ownerRestaurantDetailService.getRestaurantDetail(userDetails, restaurantId));
+    }
+
     @GetMapping("/restaurants/{restaurantId}/menus")
     public ResponseEntity<Page<DishesListDto>> getDishes(@AuthenticationPrincipal UserDetails userDetails,
                                                          @PathVariable UUID restaurantId,

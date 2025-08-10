@@ -1,9 +1,6 @@
 package com.backend.backend.domain.service.mapper;
 
-import com.backend.backend.domain.dto.RequestAddRestaurantDto;
-import com.backend.backend.domain.dto.RequestEditRestaurantHeaderDto;
-import com.backend.backend.domain.dto.RestaurantCategoryDetailDto;
-import com.backend.backend.domain.dto.RestaurantCategoryDto;
+import com.backend.backend.domain.dto.*;
 import com.backend.backend.domain.model.*;
 
 import java.util.Collections;
@@ -11,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class RestaurantMapper {
-    //店舗登録
+    // 店舗登録
     public static Restaurant toRestaurant(RequestAddRestaurantDto dto, User user) {
         Restaurant restaurant = new Restaurant();
         restaurant.setUser(user);
@@ -29,7 +26,7 @@ public class RestaurantMapper {
         return restaurant;
     }
 
-    //定休日・営業時間
+    // 定休日・営業時間
     public static List<StoreSchedule> toStoreSchedule(RequestAddRestaurantDto dto, Restaurant restaurant) {
         return Optional.ofNullable(dto.getStoreScheduleDtoList())
                 .orElse(Collections.emptyList()).stream()
@@ -49,9 +46,9 @@ public class RestaurantMapper {
                 .toList();
     }
 
-    //店舗詳細ヘッダーDTOセット
+    // 店舗詳細ヘッダーDTOセット
     public static RestaurantCategoryDetailDto toRestaurantDetailHeader(Restaurant restaurant, List<RestaurantCategory> restaurantCategory) {
-       //DTOにセット
+       // DTOにセット
         RestaurantCategoryDetailDto restaurantCategoryDetailDto = new RestaurantCategoryDetailDto();
         restaurantCategoryDetailDto.setRestaurantId(restaurant.getId());
         restaurantCategoryDetailDto.setRestaurantName(restaurant.getName());
@@ -62,9 +59,9 @@ public class RestaurantMapper {
         return restaurantCategoryDetailDto;
     }
 
-    //店舗詳細ヘッダー編集
+    // 店舗詳細ヘッダー編集
     public static Restaurant toEditRestaurantDetailHeader(Restaurant restaurant, RequestEditRestaurantHeaderDto editRestaurant) {
-        //値をセット
+        // 値をセット
         restaurant.setName(editRestaurant.getRestaurantName());
         restaurant.setAddress(editRestaurant.getRestaurantAddress());
         restaurant.setPostCode(editRestaurant.getRestaurantPostCode());
@@ -73,7 +70,7 @@ public class RestaurantMapper {
         return restaurant;
     }
 
-    //店舗詳細ヘッダーカテゴリ編集
+    // 店舗詳細ヘッダーカテゴリ編集
     public static RestaurantCategory toEditRestaurantCategoryHeader(Restaurant restaurant, Category category) {
         RestaurantCategory restaurantCategory = new RestaurantCategory();
         restaurantCategory.setCategory(category);
@@ -82,7 +79,22 @@ public class RestaurantMapper {
         return restaurantCategory;
     }
 
-    //店舗一覧DTO返却
+    // 店舗詳細情報DTOセット
+    public static RestaurantDetailDto toRestaurantDetailDto(Restaurant restaurant, List<StoreSchedule> storeSchedules) {
+        //DTOセット
+        RestaurantDetailDto restaurantDetailDto = new RestaurantDetailDto();
+        restaurantDetailDto.setId(restaurant.getId());
+        restaurantDetailDto.setAddress(restaurant.getAddress());
+        restaurantDetailDto.setPhone(restaurant.getPhone());
+        restaurantDetailDto.setEmail(restaurant.getEmail());
+        restaurantDetailDto.setDescription(restaurant.getDescription());
+        restaurantDetailDto.setInteriorImageUrl(restaurant.getInteriorImageUrl());
+        restaurantDetailDto.setStoreScheduleDtoList(storeSchedules.stream().map(StoreScheduleDto::fromEntity).toList());
+
+        return restaurantDetailDto;
+    }
+
+    // 店舗一覧DTO返却
     public static RestaurantCategoryDetailDto toRestaurantCategoryDetailDto(List<RestaurantCategory> categories, Restaurant restaurant) {
         // カテゴリEntityをDTOに変換
         List<RestaurantCategoryDto> categoryList = categories.stream()

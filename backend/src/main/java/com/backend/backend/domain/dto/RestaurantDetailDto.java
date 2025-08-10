@@ -14,8 +14,8 @@ public class RestaurantDetailDto {
     private UUID id;
     private String address;
     private String phone;
+    private String email;
     private String description;
     private String interiorImageUrl;
-    private List<BusinessHoursDto> businessHoursDtoList;
-    private List<ClosedDayDto> closedDayDtoList;
+    private List<StoreScheduleDto> storeScheduleDtoList;
 }
