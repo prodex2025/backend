@@ -71,6 +71,12 @@ public class OwnerController {
         return ResponseEntity.ok(ownerRestaurantDetailService.getRestaurantDetail(userDetails, restaurantId));
     }
 
+    @PutMapping("/restaurants/{restaurantId}/profile")
+    public ResponseEntity<String> editRestaurantDetail(@AuthenticationPrincipal UserDetails userDetails, @PathVariable UUID restaurantId, @RequestBody RestaurantBasicUpdateDto dto) {
+        ownerRestaurantDetailService.editRestaurantDetailBasic(userDetails, restaurantId, dto);
+        return ResponseEntity.ok("編集完了");
+    }
+
     @GetMapping("/restaurants/{restaurantId}/menus")
     public ResponseEntity<Page<DishesListDto>> getDishes(@AuthenticationPrincipal UserDetails userDetails,
                                                          @PathVariable UUID restaurantId,
