@@ -11,6 +11,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -74,6 +75,12 @@ public class OwnerController {
     @PutMapping("/restaurants/{restaurantId}/profile")
     public ResponseEntity<String> editRestaurantDetail(@AuthenticationPrincipal UserDetails userDetails, @PathVariable UUID restaurantId, @RequestBody RestaurantBasicUpdateDto dto) {
         ownerRestaurantDetailService.editRestaurantDetailBasic(userDetails, restaurantId, dto);
+        return ResponseEntity.ok("編集完了");
+    }
+
+    @PutMapping("/restaurants/{restaurantId}/profile/schedule")
+    public ResponseEntity<String> editRestaurantDetailSchedule(@AuthenticationPrincipal UserDetails userDetails, @PathVariable UUID restaurantId, @RequestBody List<StoreScheduleDto> dto) {
+        ownerRestaurantDetailService.editRestaurantSchedule(userDetails, restaurantId, dto);
         return ResponseEntity.ok("編集完了");
     }
 

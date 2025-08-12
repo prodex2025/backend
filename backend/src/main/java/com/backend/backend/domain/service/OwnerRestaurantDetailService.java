@@ -1,13 +1,7 @@
 package com.backend.backend.domain.service;
 
-import com.backend.backend.domain.dto.RequestEditRestaurantHeaderDto;
-import com.backend.backend.domain.dto.RestaurantBasicUpdateDto;
-import com.backend.backend.domain.dto.RestaurantCategoryDetailDto;
-import com.backend.backend.domain.dto.RestaurantDetailDto;
-import com.backend.backend.domain.model.Category;
-import com.backend.backend.domain.model.Restaurant;
-import com.backend.backend.domain.model.RestaurantCategory;
-import com.backend.backend.domain.model.StoreSchedule;
+import com.backend.backend.domain.dto.*;
+import com.backend.backend.domain.model.*;
 import com.backend.backend.domain.repository.CategoryRepository;
 import com.backend.backend.domain.repository.RestaurantCategoryRepository;
 import com.backend.backend.domain.repository.RestaurantRepository;
@@ -158,6 +152,33 @@ public class OwnerRestaurantDetailService {
         applyIfHasText(dto.getInteriorImageUrl(), restaurant::setInteriorImageUrl);
 
         restaurantRepository.save(restaurant);
+    }
+
+    // 店舗定休日・営業時間の編集
+    @Transactional
+    public void editRestaurantSchedule(UserDetails userDetails, UUID restaurantId, List<StoreScheduleDto> dto) {
+        // loginId取得
+        String loginId = userDetails.getUsername();
+
+        // 店舗Idから店舗取得
+        Restaurant restaurant = restaurantRepository.findById(restaurantId)
+                .orElseThrow(()->new RuntimeException("店舗を取得できませんでした"));
+
+        // オーナー以外がアクセスした場合
+        if (loginId == null || !loginId.equals(restaurant.getUser().getLoginId())) {
+            throw new AccessDeniedException("この店舗にアクセスする権限がありません");
+        }
+
+        // それぞれの曜日に値をセット
+        List<StoreSchedule> storeScheduleList = dto.stream().map(storeScheduleDto -> {
+            StoreSchedule storeSchedule = storeScheduleRepository.findById(storeScheduleDto.getId())
+                    .orElseThrow(() -> new RuntimeException("該当するレコードはありません"));
+
+            return RestaurantMapper.editSchedule(storeSchedule, storeScheduleDto);
+        }).toList();
+
+        // 定休日・営業時間をまとめて保存
+        storeScheduleRepository.saveAll(storeScheduleList);
     }
 
     // 空文字・null・空白出ない場合値をセット

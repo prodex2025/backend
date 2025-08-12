@@ -111,4 +111,18 @@ public class RestaurantMapper {
         );
     }
 
+    // 定休日・営業時間編集
+    public static StoreSchedule editSchedule(StoreSchedule storeSchedule, StoreScheduleDto storeScheduleDto ) {
+        storeSchedule.setDayOfWeek(storeScheduleDto.getDayOfWeek());
+        storeSchedule.setIsClosed(storeScheduleDto.getIsClosed());
+        storeSchedule.setLunchStart(storeScheduleDto.getLunchStart());
+        storeSchedule.setLunchEnd(storeScheduleDto.getLunchEnd());
+        storeSchedule.setIsLunchClosed(storeScheduleDto.getIsLunchClosed());
+        storeSchedule.setDinnerStart(storeScheduleDto.getDinnerStart());
+        storeSchedule.setDinnerEnd(storeScheduleDto.getDinnerEnd());
+        storeSchedule.setIsDinnerClosed(storeScheduleDto.getIsDinnerClosed());
+
+        return storeSchedule;
+    }
+
 }
