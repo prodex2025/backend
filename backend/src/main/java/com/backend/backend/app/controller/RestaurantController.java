@@ -6,8 +6,6 @@ import com.backend.backend.domain.service.UserDishService;
 import com.backend.backend.domain.service.UserRestaurantsService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

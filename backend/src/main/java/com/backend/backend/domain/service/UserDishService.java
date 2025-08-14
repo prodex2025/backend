@@ -11,7 +11,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -30,7 +29,13 @@ public class UserDishService {
 
     private static final int DEFAULT_PAGE_SIZE = 10;
 
-    //店舗のメニュー取得
+    /**
+     * 指定された店舗IDのメニュー一覧をページネーション形式で取得します。
+     *
+     * @param restaurantId 店舗のUUID
+     * @param page 取得するページ番号
+     * @return メニュー情報のページ
+     */
     public Page<DishesListDto> getDishes(UUID restaurantId, int page) {
 
         // 店舗取得（存在チェック）
