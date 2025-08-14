@@ -1,6 +1,8 @@
 package com.backend.backend.app.controller;
 
+import com.backend.backend.domain.dto.DishesListDto;
 import com.backend.backend.domain.dto.RestaurantCategoryDetailDto;
+import com.backend.backend.domain.service.UserDishService;
 import com.backend.backend.domain.service.UserRestaurantsService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -13,9 +15,11 @@ import java.util.UUID;
 @RequestMapping("/api/restaurants")
 public class RestaurantController {
     private final UserRestaurantsService userRestaurantsService;
+    private final UserDishService userDishService;
 
-    public RestaurantController(UserRestaurantsService userRestaurantsService) {
+    public RestaurantController(UserRestaurantsService userRestaurantsService, UserDishService userDishService) {
         this.userRestaurantsService = userRestaurantsService;
+        this.userDishService = userDishService;
     }
 
     @GetMapping
@@ -30,5 +34,11 @@ public class RestaurantController {
         return ResponseEntity.ok(restaurantDetail);
     }
 
+    @GetMapping("/{restaurantId}/menus")
+    public ResponseEntity<Page<DishesListDto>> getDishes(@PathVariable UUID restaurantId,
+                                                         @RequestParam(name = "page", defaultValue = "0") int page) {
+        Page<DishesListDto> dishes = userDishService.getDishes(restaurantId, page);
+        return ResponseEntity.ok(dishes);
+    }
 
 }
