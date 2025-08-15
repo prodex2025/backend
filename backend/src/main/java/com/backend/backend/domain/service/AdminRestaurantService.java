@@ -1,6 +1,7 @@
 package com.backend.backend.domain.service;
 
 import com.backend.backend.app.status.StatusFilter;
+import com.backend.backend.domain.dto.AdminRequestApprovedDto;
 import com.backend.backend.domain.dto.AdminRequestIsPublishedDto;
 import com.backend.backend.domain.dto.AdminRestaurantDto;
 import com.backend.backend.domain.model.Restaurant;
@@ -70,6 +71,25 @@ public class AdminRestaurantService {
         }
         // 更新する値をセット
         restaurant.setIsPublished(dto.getIsPublished());
+        restaurantRepository.save(restaurant);
+    }
+
+    // 公開・非公開の更新
+    @Transactional
+    public void editApproved(UserDetails userDetails, UUID restaurantId, AdminRequestApprovedDto dto) {
+        // loginId取得
+        String loginId = userDetails.getUsername();
+        // 店舗Idから店舗取得
+        Restaurant restaurant = restaurantRepository.findById(restaurantId)
+                .orElseThrow(()->new RuntimeException("店舗を取得できませんでした"));
+
+        User user = userRepository.findByLoginId(loginId).orElseThrow(()-> new RuntimeException("Userを取得できませんでした"));
+        // 管理者以外がアクセスした場合
+        if (loginId == null || !user.getRole().equals(Role.ROLE_ADMIN)) {
+            throw new AccessDeniedException("権限がありません");
+        }
+        // 更新する値をセット
+        restaurant.setApproved(dto.getApproved());
         restaurantRepository.save(restaurant);
     }
 
