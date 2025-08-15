@@ -1,9 +1,9 @@
 package com.backend.backend.app.controller;
 
 import com.backend.backend.app.status.StatusFilter;
+import com.backend.backend.domain.dto.AdminRequestApprovedDto;
 import com.backend.backend.domain.dto.AdminRequestIsPublishedDto;
 import com.backend.backend.domain.dto.AdminRestaurantDto;
-import com.backend.backend.domain.model.Restaurant;
 import com.backend.backend.domain.service.AdminRestaurantService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -38,6 +38,15 @@ public class AdminController {
                                                   @PathVariable UUID restaurantId,
                                                   @RequestBody AdminRequestIsPublishedDto dto) {
         adminRestaurantService.editIsPublished(userDetails, restaurantId, dto);
+
+        return ResponseEntity.ok("編集完了");
+    }
+
+    @PutMapping("/restaurants/{restaurantId}/approved")
+    public ResponseEntity<String> editApproved(@AuthenticationPrincipal UserDetails userDetails,
+                                                  @PathVariable UUID restaurantId,
+                                                  @RequestBody AdminRequestApprovedDto dto) {
+        adminRestaurantService.editApproved(userDetails, restaurantId, dto);
 
         return ResponseEntity.ok("編集完了");
     }
