@@ -4,6 +4,8 @@ import com.backend.backend.app.status.StatusFilter;
 import com.backend.backend.domain.dto.AdminRequestApprovedDto;
 import com.backend.backend.domain.dto.AdminRequestIsPublishedDto;
 import com.backend.backend.domain.dto.AdminRestaurantDto;
+import com.backend.backend.domain.dto.CategoryDto;
+import com.backend.backend.domain.service.AdminCategoryService;
 import com.backend.backend.domain.service.AdminRestaurantService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -19,9 +21,12 @@ import java.util.UUID;
 public class AdminController {
 
     private final AdminRestaurantService adminRestaurantService;
+    private final AdminCategoryService adminCategoryService;
 
-    public AdminController(AdminRestaurantService adminRestaurantService) {
+    public AdminController(AdminRestaurantService adminRestaurantService,
+                           AdminCategoryService adminCategoryService) {
         this.adminRestaurantService = adminRestaurantService;
+        this.adminCategoryService = adminCategoryService;
     }
 
     @GetMapping("/restaurants")
@@ -49,6 +54,13 @@ public class AdminController {
         adminRestaurantService.editApproved(userDetails, restaurantId, dto);
 
         return ResponseEntity.ok("編集完了");
+    }
+
+    @GetMapping("/categories")
+    public ResponseEntity<List<CategoryDto>> getCategories(@AuthenticationPrincipal UserDetails userDetails) {
+        List<CategoryDto> categoryList =  adminCategoryService.getCategories(userDetails);
+
+        return ResponseEntity.ok(categoryList);
     }
 
 }
