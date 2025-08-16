@@ -1,5 +1,6 @@
 package com.backend.backend.domain.dto;
 
+import com.backend.backend.domain.model.Category;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,4 +14,11 @@ import java.util.UUID;
 public class CategoryDto {
     private UUID id;
     private String name;
+
+    public static CategoryDto from(Category category) {
+        return  new CategoryDto(
+                category.getId(),
+                category.getName()
+        );
+    }
 }
