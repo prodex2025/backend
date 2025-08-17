@@ -1,10 +1,7 @@
 package com.backend.backend.app.controller;
 
 import com.backend.backend.app.status.StatusFilter;
-import com.backend.backend.domain.dto.AdminRequestApprovedDto;
-import com.backend.backend.domain.dto.AdminRequestIsPublishedDto;
-import com.backend.backend.domain.dto.AdminRestaurantDto;
-import com.backend.backend.domain.dto.CategoryDto;
+import com.backend.backend.domain.dto.*;
 import com.backend.backend.domain.service.AdminCategoryService;
 import com.backend.backend.domain.service.AdminRestaurantService;
 import org.springframework.data.domain.Page;
@@ -61,6 +58,13 @@ public class AdminController {
         List<CategoryDto> categoryList =  adminCategoryService.getCategories(userDetails);
 
         return ResponseEntity.ok(categoryList);
+    }
+
+    @PostMapping("/categories")
+    public ResponseEntity<String> addCategory(@AuthenticationPrincipal UserDetails userDetails, @RequestBody RequestCategoryDto dto) {
+        adminCategoryService.addCategory(userDetails, dto);
+
+        return ResponseEntity.ok("追加完了");
     }
 
 }
