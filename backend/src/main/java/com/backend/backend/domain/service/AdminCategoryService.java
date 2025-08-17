@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class AdminCategoryService {
@@ -53,6 +54,20 @@ public class AdminCategoryService {
         }
         // カテゴリを追加
         categoryRepository.save(CategoryMapper.toCategory(dto));
+    }
+
+    // カテゴリ削除
+    public void deleteCategory(UserDetails userDetails, UUID categoryId) {
+        // loginId取得
+        String loginId = userDetails.getUsername();
+
+        User user = userRepository.findByLoginId(loginId).orElseThrow(()-> new RuntimeException("Userを取得できませんでした"));
+        // 管理者以外がアクセスした場合
+        if (loginId == null || !user.getRole().equals(Role.ROLE_ADMIN)) {
+            throw new AccessDeniedException("権限がありません");
+        }
+        // カテゴリを削除
+        categoryRepository.deleteById(categoryId);
     }
 
 }
