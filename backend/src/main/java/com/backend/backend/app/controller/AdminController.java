@@ -67,4 +67,11 @@ public class AdminController {
         return ResponseEntity.ok("追加完了");
     }
 
+    @DeleteMapping("/categories/{categoryId}")
+    public ResponseEntity<String> deleteCategory(@AuthenticationPrincipal UserDetails userDetails, @PathVariable UUID categoryId) {
+        adminCategoryService.deleteCategory(userDetails, categoryId);
+
+        return ResponseEntity.ok("削除完了");
+    }
+
 }
