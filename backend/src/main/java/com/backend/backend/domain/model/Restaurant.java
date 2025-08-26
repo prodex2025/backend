@@ -71,9 +71,6 @@ public class Restaurant {
     @Column(name = "updated_at", nullable = false)
     private Timestamp updatedAt;
 
-    @OneToMany(mappedBy = "restaurant", fetch = FetchType.LAZY)
-    private List<RestaurantCategory> restaurantCategories = new ArrayList<>();
-
     @PrePersist
     protected void onCreate() {
         createdAt = Timestamp.from(Instant.now());

@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -54,5 +56,8 @@ public class Dish {
     protected void onUpdate() {
         updatedAt = Timestamp.from(Instant.now());
     }
+
+    @OneToMany(mappedBy = "dish", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DishAllergy> dishAllergies = new ArrayList<>();
 
 }

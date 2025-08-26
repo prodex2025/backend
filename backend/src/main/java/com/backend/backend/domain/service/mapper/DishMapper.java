@@ -1,5 +1,7 @@
 package com.backend.backend.domain.service.mapper;
 
+import com.backend.backend.domain.dto.AllergyDto;
+import com.backend.backend.domain.dto.Dish3dDto;
 import com.backend.backend.domain.dto.DishesListDto;
 import com.backend.backend.domain.dto.RequestDishDto;
 import com.backend.backend.domain.model.Allergy;
@@ -7,6 +9,9 @@ import com.backend.backend.domain.model.Dish;
 import com.backend.backend.domain.model.DishAllergy;
 import com.backend.backend.domain.model.Restaurant;
 import org.springframework.data.domain.Page;
+
+import java.util.List;
+import java.util.UUID;
 
 public class DishMapper {
     // 料理DTO返却
@@ -17,6 +22,22 @@ public class DishMapper {
                 dish.getPrice(),
                 dish.getImageUrl()
         ));
+    }
+
+    public static Dish3dDto toDish3dDto(Dish dish) {
+        Dish3dDto dto = new Dish3dDto();
+        dto.setId(dish.getId());
+        dto.setName(dish.getName());
+        dto.setVideoUrl(dish.getVideoUrl());
+        dto.setDescription(dish.getDescription());
+
+        dto.setAllergyDtoList(
+                dish.getDishAllergies().stream()
+                        .map(AllergyDto::fromEntity)
+                        .toList()
+        );
+
+        return dto;
     }
 
     // DTOからDishに値をセット

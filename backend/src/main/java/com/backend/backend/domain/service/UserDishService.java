@@ -1,5 +1,6 @@
 package com.backend.backend.domain.service;
 
+import com.backend.backend.domain.dto.Dish3dDto;
 import com.backend.backend.domain.dto.DishesListDto;
 import com.backend.backend.domain.model.Dish;
 import com.backend.backend.domain.model.Restaurant;
@@ -47,5 +48,16 @@ public class UserDishService {
         Page<Dish> dishes = dishRepository.findByRestaurantId(pageable, restaurantId);
 
         return DishMapper.toDishesListDtoPage(dishes);
+    }
+
+    public Dish3dDto getDetails(UUID restaurantId, UUID dishId){
+
+        // 料理取得（存在チェック）
+        Dish dish = dishRepository.findByRestaurantIdAndId(restaurantId, dishId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "料理が存在しません"));
+
+        return DishMapper.toDish3dDto(dish);
+
+
     }
 }

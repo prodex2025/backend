@@ -1,10 +1,14 @@
 package com.backend.backend.app.controller;
 
+import com.backend.backend.domain.dto.Dish3dDto;
 import com.backend.backend.domain.dto.DishesListDto;
 import com.backend.backend.domain.dto.RestaurantCategoryDetailDto;
+import com.backend.backend.domain.model.Dish;
 import com.backend.backend.domain.service.UserDishService;
 import com.backend.backend.domain.service.UserRestaurantsService;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,6 +43,13 @@ public class RestaurantController {
                                                          @RequestParam(name = "page", defaultValue = "0") int page) {
         Page<DishesListDto> dishes = userDishService.getDishes(restaurantId, page);
         return ResponseEntity.ok(dishes);
+    }
+
+    @GetMapping("/{restaurantId}/dishes/{dishId}")
+    public ResponseEntity<Dish3dDto> getDishDetail(@PathVariable UUID restaurantId,
+                                                   @PathVariable UUID dishId) {
+        Dish3dDto dishDetail = userDishService.getDetails(restaurantId, dishId);
+        return ResponseEntity.ok(dishDetail);
     }
 
 }
