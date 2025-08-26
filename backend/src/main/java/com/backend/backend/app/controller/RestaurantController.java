@@ -45,10 +45,10 @@ public class RestaurantController {
         return ResponseEntity.ok(dishes);
     }
 
-    @GetMapping("/{restaurantId}/menus/{menuId}")
-    public ResponseEntity<Dish3dDto> getMenuDetail(@PathVariable UUID restaurantId,
-                                                   @PathVariable UUID menuId) {
-        Dish3dDto dishDetail = userDishService.getDetails(restaurantId, menuId);
+    @GetMapping("/{restaurantId}/dishes/{dishId}")
+    public ResponseEntity<Dish3dDto> getDishDetail(@PathVariable UUID restaurantId,
+                                                   @PathVariable UUID dishId) {
+        Dish3dDto dishDetail = userDishService.getDetails(restaurantId, dishId);
         return ResponseEntity.ok(dishDetail);
     }
 

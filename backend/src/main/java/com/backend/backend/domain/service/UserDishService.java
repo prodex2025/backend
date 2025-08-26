@@ -50,10 +50,10 @@ public class UserDishService {
         return DishMapper.toDishesListDtoPage(dishes);
     }
 
-    public Dish3dDto getDetails(UUID restaurantId, UUID menuId){
+    public Dish3dDto getDetails(UUID restaurantId, UUID dishId){
 
-        // 店舗取得（存在チェック）
-        Dish dish = dishRepository.findByRestaurantIdAndId(restaurantId, menuId)
+        // 料理取得（存在チェック）
+        Dish dish = dishRepository.findByRestaurantIdAndId(restaurantId, dishId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "料理が存在しません"));
 
         return DishMapper.toDish3dDto(dish);
