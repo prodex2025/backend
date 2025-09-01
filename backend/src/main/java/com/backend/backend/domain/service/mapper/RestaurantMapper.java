@@ -111,6 +111,25 @@ public class RestaurantMapper {
         );
     }
 
+    //店舗情報
+    public static RestaurantDetailDto toRestaurantProfileDto(Restaurant restaurant, List<StoreSchedule> storeSchedules){
+        // StoreScheduleエンティティをDTOに変換
+        List<StoreScheduleDto> scheduleList = storeSchedules.stream()
+                .map(StoreScheduleDto::fromEntity)
+                .toList();
+
+        // 店舗情報と営業スケジュールをDTOにまとめる
+        return new RestaurantDetailDto(
+            restaurant.getId(),
+            restaurant.getAddress(),
+            restaurant.getPhone(),
+            restaurant.getEmail(),
+            restaurant.getDescription(),
+            restaurant.getInteriorImageUrl(),
+            scheduleList
+        );
+    }
+
     // 定休日・営業時間編集
     public static StoreSchedule editSchedule(StoreSchedule storeSchedule, StoreScheduleDto storeScheduleDto ) {
         storeSchedule.setDayOfWeek(storeScheduleDto.getDayOfWeek());
