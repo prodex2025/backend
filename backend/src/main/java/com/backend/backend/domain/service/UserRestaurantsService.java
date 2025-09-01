@@ -1,10 +1,13 @@
 package com.backend.backend.domain.service;
 
 import com.backend.backend.domain.dto.RestaurantCategoryDetailDto;
+import com.backend.backend.domain.dto.RestaurantDetailDto;
 import com.backend.backend.domain.model.Restaurant;
 import com.backend.backend.domain.model.RestaurantCategory;
+import com.backend.backend.domain.model.StoreSchedule;
 import com.backend.backend.domain.repository.RestaurantCategoryRepository;
 import com.backend.backend.domain.repository.RestaurantRepository;
+import com.backend.backend.domain.repository.StoreScheduleRepository;
 import com.backend.backend.domain.service.mapper.RestaurantMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,10 +24,12 @@ import java.util.stream.Collectors;
 public class UserRestaurantsService {
     private final RestaurantCategoryRepository restaurantCategoryRepository;
     private final RestaurantRepository restaurantRepository;
+    private final StoreScheduleRepository storeScheduleRepository;
 
-    public UserRestaurantsService(RestaurantCategoryRepository restaurantCategoryRepository, RestaurantRepository restaurantRepository) {
+    public UserRestaurantsService(RestaurantCategoryRepository restaurantCategoryRepository, RestaurantRepository restaurantRepository, StoreScheduleRepository storeScheduleRepository) {
         this.restaurantCategoryRepository = restaurantCategoryRepository;
         this.restaurantRepository = restaurantRepository;
+        this.storeScheduleRepository = storeScheduleRepository;
     }
 
     private static final int DEFAULT_PAGE_SIZE = 10;
@@ -48,6 +53,7 @@ public class UserRestaurantsService {
         return toDtoPage(restaurants);
     }
 
+    //店舗情報取得
     public RestaurantCategoryDetailDto getRestaurantDetail(UUID restaurantId){
         Restaurant restaurant = restaurantRepository.findById(restaurantId)
                 .orElseThrow(()->new RuntimeException("店舗を取得できませんでした"));
@@ -57,6 +63,18 @@ public class UserRestaurantsService {
 
         //DTOに変換したデータを取得して、値を返す
         return RestaurantMapper.toRestaurantDetailHeader(restaurant, restaurantCategoryList);
+    }
+
+    //店舗詳細情報取得
+    public RestaurantDetailDto getRestaurantProfile(UUID restaurantId){
+        Restaurant restaurant = restaurantRepository.findById(restaurantId)
+                .orElseThrow(()->new RuntimeException("店舗を取得できませんでした"));
+
+        //中間テーブルの取得
+        List<StoreSchedule> storeSchedules = storeScheduleRepository.findByRestaurant(restaurant);
+
+        //DTOに変換したデータを取得して、値を返す
+        return RestaurantMapper.toRestaurantProfileDto(restaurant, storeSchedules);
     }
 
     private Page<RestaurantCategoryDetailDto> toDtoPage(Page<Restaurant> restaurants) {

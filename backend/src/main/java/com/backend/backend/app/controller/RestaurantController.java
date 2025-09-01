@@ -3,6 +3,7 @@ package com.backend.backend.app.controller;
 import com.backend.backend.domain.dto.Dish3dDto;
 import com.backend.backend.domain.dto.DishesListDto;
 import com.backend.backend.domain.dto.RestaurantCategoryDetailDto;
+import com.backend.backend.domain.dto.RestaurantDetailDto;
 import com.backend.backend.domain.model.Dish;
 import com.backend.backend.domain.service.UserDishService;
 import com.backend.backend.domain.service.UserRestaurantsService;
@@ -36,6 +37,12 @@ public class RestaurantController {
     public ResponseEntity<RestaurantCategoryDetailDto> getRestaurantById(@PathVariable UUID restaurantId) {
         RestaurantCategoryDetailDto restaurantDetail = userRestaurantsService.getRestaurantDetail(restaurantId);
         return ResponseEntity.ok(restaurantDetail);
+    }
+
+    @GetMapping("{restaurantId}/profile")
+    public ResponseEntity<RestaurantDetailDto> getRestaurantProfileById(@PathVariable UUID restaurantId) {
+        RestaurantDetailDto restaurantProfile = userRestaurantsService.getRestaurantProfile(restaurantId);
+        return ResponseEntity.ok(restaurantProfile);
     }
 
     @GetMapping("/{restaurantId}/menus")
