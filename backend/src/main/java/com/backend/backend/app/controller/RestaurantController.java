@@ -39,7 +39,7 @@ public class RestaurantController {
         return ResponseEntity.ok(restaurantDetail);
     }
 
-    @GetMapping("{restaurantId}/profile")
+    @GetMapping("/{restaurantId}/profile")
     public ResponseEntity<RestaurantDetailDto> getRestaurantProfileById(@PathVariable UUID restaurantId) {
         RestaurantDetailDto restaurantProfile = userRestaurantsService.getRestaurantProfile(restaurantId);
         return ResponseEntity.ok(restaurantProfile);

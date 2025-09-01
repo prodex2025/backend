@@ -68,7 +68,7 @@ public class UserRestaurantsService {
     //店舗詳細情報取得
     public RestaurantDetailDto getRestaurantProfile(UUID restaurantId){
         Restaurant restaurant = restaurantRepository.findById(restaurantId)
-                .orElseThrow(()->new RuntimeException("店舗を取得できませんでした"));
+                .orElseThrow(()->new jakarta.persistence.EntityNotFoundException("店舗を取得できませんでした"));
 
         //中間テーブルの取得
         List<StoreSchedule> storeSchedules = storeScheduleRepository.findByRestaurant(restaurant);

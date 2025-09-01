@@ -113,12 +113,12 @@ public class RestaurantMapper {
 
     //店舗情報
     public static RestaurantDetailDto toRestaurantProfileDto(Restaurant restaurant, List<StoreSchedule> storeSchedules){
-        // カテゴリEntityをDTOに変換
+        // StoreScheduleエンティティをDTOに変換
         List<StoreScheduleDto> scheduleList = storeSchedules.stream()
                 .map(StoreScheduleDto::fromEntity)
                 .toList();
 
-        // 店舗情報とカテゴリをDTOにまとめる
+        // 店舗情報と営業スケジュールをDTOにまとめる
         return new RestaurantDetailDto(
             restaurant.getId(),
             restaurant.getAddress(),
