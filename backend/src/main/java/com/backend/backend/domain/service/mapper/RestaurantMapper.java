@@ -16,10 +16,8 @@ public class RestaurantMapper {
         restaurant.setAddress(dto.getAddress());
         restaurant.setPostCode(dto.getPostCode());
         restaurant.setPhone(dto.getPhone());
-        restaurant.setEmail("example@example.com");
+        restaurant.setEmail(dto.getEmail());
         restaurant.setDescription(dto.getDescription());
-        restaurant.setImageUrl(dto.getImageUrl());
-        restaurant.setInteriorImageUrl(dto.getInteriorImageUrl());
         restaurant.setCertificate(dto.getCertificate());
         restaurant.setApproved(false);
         restaurant.setIsPublished(false);

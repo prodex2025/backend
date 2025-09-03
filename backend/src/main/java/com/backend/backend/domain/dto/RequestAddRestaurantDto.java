@@ -14,9 +14,10 @@ public class RequestAddRestaurantDto {
     private String address;
     private String postCode;
     private String phone;
+    private String email;
     private String description;
-    private String imageUrl;
-    private String interiorImageUrl;
+    private String exteriorTmpKey;
+    private String interiorTmpKey;
     private String certificate;
     private List<StoreScheduleDto> storeScheduleDtoList;
     private List<CategoryDto> categoryDtoList;
