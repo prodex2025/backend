@@ -17,6 +17,9 @@ public class RestaurantMapper {
         restaurant.setPostCode(dto.getPostCode());
         restaurant.setPhone(dto.getPhone());
         restaurant.setEmail(dto.getEmail());
+        // 仮キーをセット
+        restaurant.setImageUrl("PENDING");
+        restaurant.setInteriorImageUrl("PENDING");
         restaurant.setDescription(dto.getDescription());
         restaurant.setCertificate(dto.getCertificate());
         restaurant.setApproved(false);
@@ -63,7 +66,6 @@ public class RestaurantMapper {
         restaurant.setName(editRestaurant.getRestaurantName());
         restaurant.setAddress(editRestaurant.getRestaurantAddress());
         restaurant.setPostCode(editRestaurant.getRestaurantPostCode());
-        restaurant.setImageUrl(editRestaurant.getImageUrl());
 
         return restaurant;
     }

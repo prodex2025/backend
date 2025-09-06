@@ -39,7 +39,7 @@ public class OwnerRestaurantService {
         this.s3Mover = s3Mover;
     }
 
-    //店舗一覧を取得
+    // 店舗一覧を取得
     public Page<OwnerRestaurantsDto> getMyRestaurants(String loginId, int page) {
         //Userオブジェクトを取得
         User user = userRepository.findByLoginId(loginId)
@@ -80,25 +80,27 @@ public class OwnerRestaurantService {
 
         // 店舗登録
         Restaurant restaurant = RestaurantMapper.toRestaurant(restaurantDto, user);
-        Restaurant addRestaurant = restaurantRepository.save(restaurant);
+        restaurantRepository.save(restaurant);
 
-        String exteriorKey = moveToFinal(restaurantDto.getExteriorTmpKey(), "exterior", addRestaurant.getId());
-        String interiorKey = moveToFinal(restaurantDto.getInteriorTmpKey(), "interior", addRestaurant.getId());
+        String exteriorKey = moveToFinal(restaurantDto.getExteriorTmpKey(), "exterior", restaurant.getId());
+        String interiorKey = moveToFinal(restaurantDto.getInteriorTmpKey(), "interior", restaurant.getId());
 
         // 管理エンティティにセット
-        addRestaurant.setImageUrl(exteriorKey);
-        addRestaurant.setInteriorImageUrl(interiorKey);
-        restaurantRepository.save(addRestaurant);
+        restaurant.setImageUrl(exteriorKey);
+        restaurant.setInteriorImageUrl(interiorKey);
+        restaurantRepository.save(restaurant);
 
         // tmp削除
         s3Mover.deleteBatch(List.of(restaurantDto.getExteriorTmpKey(), restaurantDto.getInteriorTmpKey()));
 
         // 定休日・営業時間の登録
-        List<StoreSchedule> storeSchedules = RestaurantMapper.toStoreSchedule(restaurantDto, addRestaurant);
+        List<StoreSchedule> storeSchedules = RestaurantMapper.toStoreSchedule(restaurantDto, restaurant);
         storeScheduleRepository.saveAll(storeSchedules);
     }
 
+    // 仮保存から本番の保存にコピー
     private String moveToFinal(String tmpKey, String kind, UUID restaurantId) {
+        System.out.println(tmpKey);
         // tmpKey
         String fileName = tmpKey.substring(tmpKey.lastIndexOf('/') + 1);
         String destKey  = "restaurants/%s/%s/%s".formatted(restaurantId, kind, fileName);
