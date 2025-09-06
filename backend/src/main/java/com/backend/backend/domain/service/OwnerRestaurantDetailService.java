@@ -112,23 +112,48 @@ public class OwnerRestaurantDetailService {
         restaurantCategoryRepository.saveAll(restaurantCategoryList);
     }
 
-    //店舗削除
+    // 店舗削除
     @Transactional
     public void deleteRestaurant(UserDetails userDetails, UUID restaurantId) {
         //loginId取得
         String loginId = userDetails.getUsername();
 
-        //店舗Idから店舗取得
+        // 店舗Idから店舗取得
         Restaurant restaurant = restaurantRepository.findById(restaurantId)
                 .orElseThrow(()->new RuntimeException("店舗を取得できませんでした"));
 
-        //オーナー以外がアクセスした場合
+        // 削除対象のS3キーを事前に回収
+        List<String> deleteAfterCommit = new ArrayList<>();
+        if (hasText(restaurant.getImageUrl())) {
+            deleteAfterCommit.add(restaurant.getImageUrl());
+        }
+        if (hasText(restaurant.getInteriorImageUrl())) {
+            deleteAfterCommit.add(restaurant.getInteriorImageUrl());
+        }
+
+        // オーナー以外がアクセスした場合
         if (loginId == null || !loginId.equals(restaurant.getUser().getLoginId())) {
             throw new AccessDeniedException("この店舗にアクセスする権限がありません");
         }
+
         //店舗削除・中間テーブルの削除
         restaurantRepository.delete(restaurant);
-        restaurantCategoryRepository.deleteByRestaurant(restaurant);
+
+        // コミット後にS3削除
+        if (!deleteAfterCommit.isEmpty()) {
+            org.springframework.transaction.support.TransactionSynchronizationManager
+                    .registerSynchronization(new org.springframework.transaction.support.TransactionSynchronization() {
+                        @Override public void afterCommit() {
+                            try {
+                                s3Mover.deleteBatch(deleteAfterCommit); // 個別ファイル
+                            } catch (Exception ignored) {}
+                            try {
+                                // restaurants/{restaurantId}/ 以下を全削除
+                                s3Mover.deletePrefix("restaurants/" + restaurantId + "/");
+                            } catch (Exception ignored) {}
+                        }
+                    });
+        }
     }
 
     // 店舗詳細情報を表示
