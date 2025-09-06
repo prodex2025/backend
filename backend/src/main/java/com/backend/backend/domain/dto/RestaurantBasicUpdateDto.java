@@ -11,7 +11,7 @@ public class RestaurantBasicUpdateDto {
     private String address;
     private String phone;
     private String email;
-    private String interiorImageUrl;
+    private String interiorTmpKey;;
 }
 
 

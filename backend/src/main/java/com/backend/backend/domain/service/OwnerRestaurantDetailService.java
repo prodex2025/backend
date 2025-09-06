@@ -7,17 +7,17 @@ import com.backend.backend.domain.repository.RestaurantCategoryRepository;
 import com.backend.backend.domain.repository.RestaurantRepository;
 import com.backend.backend.domain.repository.StoreScheduleRepository;
 import com.backend.backend.domain.service.mapper.RestaurantMapper;
+import com.backend.backend.domain.service.s3.S3Mover;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
+
+import static org.springframework.util.StringUtils.hasText;
 
 @Service
 public class OwnerRestaurantDetailService {
@@ -25,15 +25,18 @@ public class OwnerRestaurantDetailService {
     private final RestaurantCategoryRepository restaurantCategoryRepository;
     private final CategoryRepository categoryRepository;
     private final StoreScheduleRepository storeScheduleRepository;
+    private final S3Mover s3Mover;
 
     public OwnerRestaurantDetailService(RestaurantRepository restaurantRepository,
                                         RestaurantCategoryRepository restaurantCategoryRepository,
                                         CategoryRepository categoryRepository,
-                                        StoreScheduleRepository storeScheduleRepository) {
+                                        StoreScheduleRepository storeScheduleRepository,
+                                        S3Mover s3Mover) {
         this.restaurantRepository = restaurantRepository;
         this.restaurantCategoryRepository = restaurantCategoryRepository;
         this.categoryRepository = categoryRepository;
         this.storeScheduleRepository = storeScheduleRepository;
+        this.s3Mover = s3Mover;
     }
 
     //店舗詳細のヘッダー部分を取得
@@ -71,9 +74,27 @@ public class OwnerRestaurantDetailService {
         if (loginId == null || !loginId.equals(restaurant.getUser().getLoginId())) {
             throw new AccessDeniedException("この店舗にアクセスする権限がありません");
         }
+        List<String> deleteAfterCommit = new ArrayList<>();
+
+        if (hasText(requestDto.getExteriorTmpKey())) {
+            String newKey = moveToFinal(requestDto.getExteriorTmpKey(), "exterior", restaurant.getId());
+            String oldKey = restaurant.getImageUrl();
+            restaurant.setImageUrl(newKey);
+            if (hasText(oldKey)) deleteAfterCommit.add(oldKey);
+            deleteAfterCommit.add(requestDto.getExteriorTmpKey());
+        }
         //値を上書き
         Restaurant editRestaurant = RestaurantMapper.toEditRestaurantDetailHeader(restaurant, requestDto);
         restaurantRepository.save(editRestaurant);
+
+        if (!deleteAfterCommit.isEmpty()) {
+            org.springframework.transaction.support.TransactionSynchronizationManager
+                    .registerSynchronization(new org.springframework.transaction.support.TransactionSynchronization() {
+                        @Override public void afterCommit() {
+                            try { s3Mover.deleteBatch(deleteAfterCommit); } catch (Exception ignored) {}
+                        }
+                    });
+        }
 
         //中間テーブルの削除
         restaurantCategoryRepository.deleteByRestaurant(restaurant);
@@ -149,9 +170,28 @@ public class OwnerRestaurantDetailService {
         applyIfHasText(dto.getAddress(), restaurant::setAddress);
         applyIfHasText(dto.getPhone(), restaurant::setPhone);
         applyIfHasText(dto.getEmail(), restaurant::setEmail);
-        applyIfHasText(dto.getInteriorImageUrl(), restaurant::setInteriorImageUrl);
 
-        restaurantRepository.save(restaurant);
+        List<String> deleteAfterCommit = new ArrayList<>();
+
+        if (hasText(dto.getInteriorTmpKey())) {
+            String newKey = moveToFinal(dto.getInteriorTmpKey(), "interior", restaurant.getId());
+            String oldKey = restaurant.getInteriorImageUrl();
+            restaurant.setInteriorImageUrl(newKey);
+            if (hasText(oldKey)) deleteAfterCommit.add(oldKey);
+            deleteAfterCommit.add(dto.getInteriorTmpKey());
+        }
+
+        restaurantRepository.save(restaurant); // 変更検知でもOK
+
+        // ----- コミット後にまとめて削除（ロールバック安全） -----
+        if (!deleteAfterCommit.isEmpty()) {
+            org.springframework.transaction.support.TransactionSynchronizationManager
+                    .registerSynchronization(new org.springframework.transaction.support.TransactionSynchronization() {
+                        @Override public void afterCommit() {
+                            try { s3Mover.deleteBatch(deleteAfterCommit); } catch (Exception ignored) {}
+                        }
+                    });
+        }
     }
 
     // 店舗定休日・営業時間の編集
@@ -183,9 +223,33 @@ public class OwnerRestaurantDetailService {
 
     // 空文字・null・空白出ない場合値をセット
     private void applyIfHasText(String value, Consumer<String> setter) {
-        if (StringUtils.hasText(value)) {
+        if (hasText(value)) {
             setter.accept(value);
         }
     }
 
+    private String moveToFinal(String tmpKeyMaybeUrl, String kind, UUID restaurantId) {
+        // URLが来てもキーへ補正
+        String srcKey = normalizeKey(tmpKeyMaybeUrl);
+
+        // 最低限のバリデーション
+        if (!srcKey.startsWith("restaurants/tmp/")) {
+            throw new IllegalArgumentException("tmpキーの形式が不正です: " + srcKey);
+        }
+
+        String fileName = srcKey.substring(srcKey.lastIndexOf('/') + 1);
+        String destKey  = "restaurants/%s/%s/%s".formatted(restaurantId, kind, fileName);
+
+        // S3内部コピー（S3Moverは既存のものを使用）
+        s3Mover.copy(srcKey, destKey);
+        return destKey;
+    }
+
+    private String normalizeKey(String maybeUrl) {
+        if (maybeUrl.startsWith("http")) {
+            int i = maybeUrl.indexOf(".amazonaws.com/");
+            if (i > 0) return maybeUrl.substring(i + ".amazonaws.com/".length());
+        }
+        return maybeUrl;
+    }
 }
