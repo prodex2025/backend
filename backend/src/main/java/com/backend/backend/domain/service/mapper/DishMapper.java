@@ -17,6 +17,7 @@ public class DishMapper {
     // 料理DTO返却
     public static Page<DishesListDto> toDishesListDtoPage(Page<Dish> dishes) {
         return dishes.map(dish -> new DishesListDto(
+                // 店舗情報からDTOに変換して返却
                 dish.getId(),
                 dish.getName(),
                 dish.getPrice(),

@@ -71,7 +71,26 @@ public class OwnerDishService {
         Pageable pageable = PageRequest.of(page, DEFAULT_PAGE_SIZE, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Dish> dishes = dishRepository.findByRestaurantId(pageable, restaurantId);
 
-        return DishMapper.toDishesListDtoPage(dishes);
+        return dishes.map(dish -> {
+            String signedUrl;
+            String key = dish.getImageUrl();
+            if (key == null || key.isBlank()) {
+                signedUrl = "NO_IMAGE_URL";
+            } else {
+                try {
+                    signedUrl = s3UrlService.generatePresignedUrl(key);
+                } catch (Exception e) {
+                    signedUrl = "NO_IMAGE_URL";
+                }
+            }
+
+            return new DishesListDto(
+                    dish.getId(),
+                    dish.getName(),
+                    dish.getPrice(),
+                    signedUrl
+            );
+        });
     }
 
     // 店舗メニュー登録
