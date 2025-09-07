@@ -95,8 +95,8 @@ public class OwnerDishService {
         Dish dish = DishMapper.toDishEntity(dto, restaurant);
         dishRepository.save(dish);
 
-        String imageKey = moveToFinal(dto.getImageKey(), "image", dish.getId());
-        String videoKey = moveToFinal(dto.getVideoKey(), "video", dish.getId());
+        String imageKey = moveToFinal(dto.getImageKey(), "images", dish.getId());
+        String videoKey = moveToFinal(dto.getVideoKey(), "models", dish.getId());
 
         dish.setImageUrl(imageKey);
         dish.setVideoUrl(videoKey);
@@ -137,7 +137,7 @@ public class OwnerDishService {
         List<String> deleteAfterCommit = new ArrayList<>();
 
         if (hasText(dto.getImageKey())) {
-            String newKey = moveToFinal(dto.getImageKey(), "image", dish.getId());
+            String newKey = moveToFinal(dto.getImageKey(), "images", dish.getId());
             String oldKey = dish.getImageUrl();
             dish.setImageUrl(newKey);
             if (hasText(oldKey)) deleteAfterCommit.add(oldKey);
@@ -167,7 +167,7 @@ public class OwnerDishService {
                             } catch (Exception ignored) {}
                             try {
                                 // restaurants/{restaurantId}/ 以下を全削除
-                                s3Mover.deletePrefix("restaurants/" + restaurantId + "/");
+                                s3Mover.deletePrefix("dishes/" + dishId + "/");
                             } catch (Exception ignored) {}
                         }
                     });
@@ -175,6 +175,7 @@ public class OwnerDishService {
     }
 
     // メニュー削除
+    @Transactional
     public void deleteDish(UserDetails userDetails, UUID restaurantId, UUID dishId) {
         // loginIdを取得
         String loginId = userDetails.getUsername();
@@ -195,11 +196,33 @@ public class OwnerDishService {
             throw new AccessDeniedException("この料理を削除する権限がありません");
         }
 
-        // 関連するアレルギー情報を削除
-        dishAllergyRepository.deleteByDish(dish);
+        // 削除対象のS3キーを事前に回収
+        List<String> deleteAfterCommit = new ArrayList<>();
+        if (hasText(dish.getImageUrl())) {
+            deleteAfterCommit.add(dish.getImageUrl());
+        }
+
+        if (hasText(dish.getVideoUrl())) {
+            deleteAfterCommit.add(dish.getVideoUrl());
+        }
 
         // 料理削除
         dishRepository.deleteById(dishId);
+
+        // コミット後にS3削除
+        if (!deleteAfterCommit.isEmpty()) {
+            org.springframework.transaction.support.TransactionSynchronizationManager
+                    .registerSynchronization(new org.springframework.transaction.support.TransactionSynchronization() {
+                        @Override public void afterCommit() {
+                            try {
+                                s3Mover.deleteBatch(deleteAfterCommit); // 個別ファイル
+                            } catch (Exception ignored) {}
+                            try {
+                                s3Mover.deletePrefix("dishes/" + dishId + "/");
+                            } catch (Exception ignored) {}
+                        }
+                    });
+        }
     }
 
     // 認証チェック
