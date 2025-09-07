@@ -67,9 +67,6 @@ public class DishMapper {
         dish.setName(dto.getName());
         dish.setPrice(dto.getPrice());
         dish.setDescription(dto.getDescription());
-        dish.setImageUrl("PENDING");
-        dish.setVideoUrl("PENDING");
-
         return dish;
     }
 }

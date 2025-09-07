@@ -22,9 +22,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+
+import static org.springframework.util.StringUtils.hasText;
 
 @Service
 public class OwnerDishService {
@@ -130,11 +133,45 @@ public class OwnerDishService {
         Dish dish = dishRepository.findById(dishId)
                 .orElseThrow(() -> new RuntimeException("料理を取得できませんでした"));
 
+        // 削除対象のS3キーを事前に回収
+        List<String> deleteAfterCommit = new ArrayList<>();
+
+        if (hasText(dto.getImageKey())) {
+            String newKey = moveToFinal(dto.getImageKey(), "image", dish.getId());
+            String oldKey = dish.getImageUrl();
+            dish.setImageUrl(newKey);
+            if (hasText(oldKey)) deleteAfterCommit.add(oldKey);
+            deleteAfterCommit.add(dto.getImageKey());
+        }
+
+        if (hasText(dto.getVideoKey())) {
+            String newKey = moveToFinal(dto.getVideoKey(), "models", dish.getId());
+            String oldKey = dish.getVideoUrl();
+            dish.setVideoUrl(newKey);
+            if (hasText(oldKey)) deleteAfterCommit.add(oldKey);
+            deleteAfterCommit.add(dto.getImageKey());
+        }
         // 料理情報更新
         updateDishInfo(dish, dto);
 
         // アレルギー情報の更新
         updateDishAllergies(dish, dto.getAllergyDtoList());
+
+        // コミット後にS3削除
+        if (!deleteAfterCommit.isEmpty()) {
+            org.springframework.transaction.support.TransactionSynchronizationManager
+                    .registerSynchronization(new org.springframework.transaction.support.TransactionSynchronization() {
+                        @Override public void afterCommit() {
+                            try {
+                                s3Mover.deleteBatch(deleteAfterCommit); // 個別ファイル
+                            } catch (Exception ignored) {}
+                            try {
+                                // restaurants/{restaurantId}/ 以下を全削除
+                                s3Mover.deletePrefix("restaurants/" + restaurantId + "/");
+                            } catch (Exception ignored) {}
+                        }
+                    });
+        }
     }
 
     // メニュー削除
@@ -228,7 +265,6 @@ public class OwnerDishService {
 
     // 仮保存から本番の保存にコピー
     private String moveToFinal(String tmpKey, String kind, UUID dishId) {
-        System.out.println(tmpKey);
         // tmpKey
         String fileName = tmpKey.substring(tmpKey.lastIndexOf('/') + 1);
         String destKey  = "dishes/%s/%s/%s".formatted(dishId, kind, fileName);
