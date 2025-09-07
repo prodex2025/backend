@@ -9,6 +9,8 @@ import com.backend.backend.domain.model.DishAllergy;
 import com.backend.backend.domain.model.Restaurant;
 import com.backend.backend.domain.repository.*;
 import com.backend.backend.domain.service.mapper.DishMapper;
+import com.backend.backend.domain.service.s3.S3Mover;
+import com.backend.backend.domain.service.s3.S3UrlService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -31,15 +33,21 @@ public class OwnerDishService {
     private final RestaurantRepository restaurantRepository;
     private final AllergyRepository allergyRepository;
     private final DishAllergyRepository dishAllergyRepository;
+    private final S3Mover s3Mover;
+    private final S3UrlService s3UrlService;
 
     public OwnerDishService(DishRepository dishRepository,
                             RestaurantRepository restaurantRepository,
                             AllergyRepository allergyRepository,
-                            DishAllergyRepository dishAllergyRepository) {
+                            DishAllergyRepository dishAllergyRepository,
+                            S3Mover s3Mover,
+                            S3UrlService s3UrlService) {
         this.dishRepository = dishRepository;
         this.restaurantRepository = restaurantRepository;
         this.allergyRepository = allergyRepository;
         this.dishAllergyRepository = dishAllergyRepository;
+        this.s3Mover = s3Mover;
+        this.s3UrlService = s3UrlService;
     }
 
     private static final int DEFAULT_PAGE_SIZE = 10;
@@ -83,6 +91,16 @@ public class OwnerDishService {
         // 料理を登録
         Dish dish = DishMapper.toDishEntity(dto, restaurant);
         dishRepository.save(dish);
+
+        String imageKey = moveToFinal(dto.getImageKey(), "image", dish.getId());
+        String videoKey = moveToFinal(dto.getVideoKey(), "video", dish.getId());
+
+        dish.setImageUrl(imageKey);
+        dish.setVideoUrl(videoKey);
+        restaurantRepository.save(restaurant);
+
+        // tmp削除
+        s3Mover.deleteBatch(List.of(dto.getImageKey(), dto.getVideoKey()));
 
         // アレルギー情報の処理
         List<DishAllergy> dishAllergyList = createDishAllergies(dish, dto.getAllergyDtoList());
@@ -206,6 +224,18 @@ public class OwnerDishService {
             if (!newDishAllergyList.isEmpty()) {
                 dishAllergyRepository.saveAll(newDishAllergyList);
             }
+    }
+
+    // 仮保存から本番の保存にコピー
+    private String moveToFinal(String tmpKey, String kind, UUID dishId) {
+        System.out.println(tmpKey);
+        // tmpKey
+        String fileName = tmpKey.substring(tmpKey.lastIndexOf('/') + 1);
+        String destKey  = "dishes/%s/%s/%s".formatted(dishId, kind, fileName);
+
+        s3Mover.copy(tmpKey, destKey);
+
+        return destKey;
     }
 
 }

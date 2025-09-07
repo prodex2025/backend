@@ -66,7 +66,7 @@ public class OwnerRestaurantService {
                     signedUrl = "NO_IMAGE_URL";
                 }
             }
-            
+
             // 中間テーブルからカテゴリ一覧を取得
             List<RestaurantCategory> categories = restaurantCategoryRepository.findByRestaurantId(restaurant.getId());
 
