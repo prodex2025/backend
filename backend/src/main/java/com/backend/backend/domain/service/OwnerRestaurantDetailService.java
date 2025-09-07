@@ -8,6 +8,7 @@ import com.backend.backend.domain.repository.RestaurantRepository;
 import com.backend.backend.domain.repository.StoreScheduleRepository;
 import com.backend.backend.domain.service.mapper.RestaurantMapper;
 import com.backend.backend.domain.service.s3.S3Mover;
+import com.backend.backend.domain.service.s3.S3UrlService;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -26,17 +27,20 @@ public class OwnerRestaurantDetailService {
     private final CategoryRepository categoryRepository;
     private final StoreScheduleRepository storeScheduleRepository;
     private final S3Mover s3Mover;
+    private final S3UrlService s3UrlService;
 
     public OwnerRestaurantDetailService(RestaurantRepository restaurantRepository,
                                         RestaurantCategoryRepository restaurantCategoryRepository,
                                         CategoryRepository categoryRepository,
                                         StoreScheduleRepository storeScheduleRepository,
-                                        S3Mover s3Mover) {
+                                        S3Mover s3Mover,
+                                        S3UrlService s3UrlService) {
         this.restaurantRepository = restaurantRepository;
         this.restaurantCategoryRepository = restaurantCategoryRepository;
         this.categoryRepository = categoryRepository;
         this.storeScheduleRepository = storeScheduleRepository;
         this.s3Mover = s3Mover;
+        this.s3UrlService = s3UrlService;
     }
 
     //店舗詳細のヘッダー部分を取得
@@ -169,11 +173,23 @@ public class OwnerRestaurantDetailService {
         if (loginId == null || !loginId.equals(restaurant.getUser().getLoginId())) {
             throw new AccessDeniedException("この店舗にアクセスする権限がありません");
         }
+
+        String signedUrl;
+        String key = restaurant.getInteriorImageUrl();
+        if (key == null || key.isBlank()) {
+            signedUrl = "NO_IMAGE_URL";
+        } else {
+            try {
+                signedUrl = s3UrlService.generatePresignedUrl(key);
+            } catch (Exception e) {
+                signedUrl = "NO_IMAGE_URL";
+            }
+        }
         // 定休日・営業時間を取得
         List<StoreSchedule> storeSchedules = storeScheduleRepository.findByRestaurant(restaurant);
 
         // DTOに変換したデータを取得して、値を返す
-        return RestaurantMapper.toRestaurantDetailDto(restaurant, storeSchedules);
+        return RestaurantMapper.toRestaurantDetailDto(restaurant, signedUrl, storeSchedules);
     }
 
     // 店舗基本情報を編集

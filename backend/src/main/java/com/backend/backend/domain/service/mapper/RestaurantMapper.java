@@ -80,7 +80,7 @@ public class RestaurantMapper {
     }
 
     // 店舗詳細情報DTOセット
-    public static RestaurantDetailDto toRestaurantDetailDto(Restaurant restaurant, List<StoreSchedule> storeSchedules) {
+    public static RestaurantDetailDto toRestaurantDetailDto(Restaurant restaurant, String signedUrl, List<StoreSchedule> storeSchedules) {
         //DTOセット
         RestaurantDetailDto restaurantDetailDto = new RestaurantDetailDto();
         restaurantDetailDto.setId(restaurant.getId());
@@ -88,7 +88,7 @@ public class RestaurantMapper {
         restaurantDetailDto.setPhone(restaurant.getPhone());
         restaurantDetailDto.setEmail(restaurant.getEmail());
         restaurantDetailDto.setDescription(restaurant.getDescription());
-        restaurantDetailDto.setInteriorImageUrl(restaurant.getInteriorImageUrl());
+        restaurantDetailDto.setInteriorImageUrl(signedUrl);
         restaurantDetailDto.setStoreScheduleDtoList(storeSchedules.stream().map(StoreScheduleDto::fromEntity).toList());
 
         return restaurantDetailDto;
