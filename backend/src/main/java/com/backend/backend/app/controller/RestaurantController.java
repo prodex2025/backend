@@ -45,7 +45,7 @@ public class RestaurantController {
         return ResponseEntity.ok(restaurantProfile);
     }
 
-    @GetMapping("/{restaurantId}/menus")
+    @GetMapping("/{restaurantId}/dishes")
     public ResponseEntity<Page<DishesListDto>> getDishes(@PathVariable UUID restaurantId,
                                                          @RequestParam(name = "page", defaultValue = "0") int page) {
         Page<DishesListDto> dishes = userDishService.getDishes(restaurantId, page);

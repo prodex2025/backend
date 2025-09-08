@@ -25,11 +25,11 @@ public class DishMapper {
         );
     }
 
-    public static Dish3dDto toDish3dDto(Dish dish) {
+    public static Dish3dDto toDish3dDto(Dish dish, String signedUrl) {
         Dish3dDto dto = new Dish3dDto();
         dto.setId(dish.getId());
         dto.setName(dish.getName());
-        dto.setVideoUrl(dish.getVideoUrl());
+        dto.setVideoUrl(signedUrl);
         dto.setDescription(dish.getDescription());
 
         dto.setAllergyDtoList(

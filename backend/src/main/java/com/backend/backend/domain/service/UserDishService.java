@@ -79,8 +79,18 @@ public class UserDishService {
         Dish dish = dishRepository.findByRestaurantIdAndId(restaurantId, dishId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "料理が存在しません"));
 
-        return DishMapper.toDish3dDto(dish);
+        String signedUrl;
+        String key = dish.getVideoUrl();
+        if (key == null || key.isBlank()) {
+            signedUrl = "NO_IMAGE_URL";
+        } else {
+            try {
+                signedUrl = s3UrlService.generatePresignedUrl(key);
+            } catch (Exception e) {
+                signedUrl = "NO_IMAGE_URL";
+            }
+        }
 
-
+        return DishMapper.toDish3dDto(dish, signedUrl);
     }
 }
