@@ -22,8 +22,9 @@ public class RestaurantMapper {
         restaurant.setInteriorImageUrl("PENDING");
         restaurant.setDescription(dto.getDescription());
         restaurant.setCertificate(dto.getCertificate());
-        restaurant.setApproved(false);
-        restaurant.setIsPublished(false);
+        // 仮でtrueセット
+        restaurant.setApproved(true);
+        restaurant.setIsPublished(true);
         return restaurant;
     }
 
@@ -51,10 +52,10 @@ public class RestaurantMapper {
     public static RestaurantCategoryDetailDto toRestaurantDetailHeader(Restaurant restaurant, List<RestaurantCategory> restaurantCategory) {
        // DTOにセット
         RestaurantCategoryDetailDto restaurantCategoryDetailDto = new RestaurantCategoryDetailDto();
-        restaurantCategoryDetailDto.setRestaurantId(restaurant.getId());
-        restaurantCategoryDetailDto.setRestaurantName(restaurant.getName());
-        restaurantCategoryDetailDto.setRestaurantAddress(restaurant.getAddress());
-        restaurantCategoryDetailDto.setRestaurantPostCode(restaurant.getPostCode());
+        restaurantCategoryDetailDto.setId(restaurant.getId());
+        restaurantCategoryDetailDto.setName(restaurant.getName());
+        restaurantCategoryDetailDto.setAddress(restaurant.getAddress());
+        restaurantCategoryDetailDto.setPostCode(restaurant.getPostCode());
         restaurantCategoryDetailDto.setCategoryDtoList(restaurantCategory.stream().map(RestaurantCategoryDto::fromEntity).toList());
 
         return restaurantCategoryDetailDto;
@@ -95,7 +96,7 @@ public class RestaurantMapper {
     }
 
     // 店舗一覧DTO返却
-    public static RestaurantCategoryDetailDto toRestaurantCategoryDetailDto(List<RestaurantCategory> categories, Restaurant restaurant) {
+    public static RestaurantCategoryDetailDto toRestaurantCategoryDetailDto(List<RestaurantCategory> categories, Restaurant restaurant, String signedUrl) {
         // カテゴリEntityをDTOに変換
         List<RestaurantCategoryDto> categoryList = categories.stream()
                 .map(RestaurantCategoryDto::fromEntity)
@@ -107,6 +108,7 @@ public class RestaurantMapper {
                 restaurant.getName(),
                 restaurant.getAddress(),
                 restaurant.getPostCode(),
+                signedUrl,
                 categoryList
         );
     }

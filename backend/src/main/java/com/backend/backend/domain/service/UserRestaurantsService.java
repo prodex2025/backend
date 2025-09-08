@@ -9,6 +9,7 @@ import com.backend.backend.domain.repository.RestaurantCategoryRepository;
 import com.backend.backend.domain.repository.RestaurantRepository;
 import com.backend.backend.domain.repository.StoreScheduleRepository;
 import com.backend.backend.domain.service.mapper.RestaurantMapper;
+import com.backend.backend.domain.service.s3.S3UrlService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -25,11 +26,16 @@ public class UserRestaurantsService {
     private final RestaurantCategoryRepository restaurantCategoryRepository;
     private final RestaurantRepository restaurantRepository;
     private final StoreScheduleRepository storeScheduleRepository;
+    private final S3UrlService s3UrlService;
 
-    public UserRestaurantsService(RestaurantCategoryRepository restaurantCategoryRepository, RestaurantRepository restaurantRepository, StoreScheduleRepository storeScheduleRepository) {
+    public UserRestaurantsService(RestaurantCategoryRepository restaurantCategoryRepository,
+                                  RestaurantRepository restaurantRepository,
+                                  StoreScheduleRepository storeScheduleRepository,
+                                  S3UrlService s3UrlService) {
         this.restaurantCategoryRepository = restaurantCategoryRepository;
         this.restaurantRepository = restaurantRepository;
         this.storeScheduleRepository = storeScheduleRepository;
+        this.s3UrlService = s3UrlService;
     }
 
     private static final int DEFAULT_PAGE_SIZE = 10;
@@ -90,8 +96,19 @@ public class UserRestaurantsService {
                 .collect(Collectors.groupingBy(rc -> rc.getRestaurant().getId()));
 
         return restaurants.map(restaurant -> {
+            String signedUrl;
+            String key = restaurant.getImageUrl();
+            if (key == null || key.isBlank()) {
+                signedUrl = "NO_IMAGE_URL";
+            } else {
+                try {
+                    signedUrl = s3UrlService.generatePresignedUrl(key);
+                } catch (Exception e) {
+                    signedUrl = "NO_IMAGE_URL";
+                }
+            }
             List<RestaurantCategory> categories = categoryMap.getOrDefault(restaurant.getId(), List.of());
-            return RestaurantMapper.toRestaurantCategoryDetailDto(categories, restaurant);
+            return RestaurantMapper.toRestaurantCategoryDetailDto(categories, restaurant, signedUrl);
         });
     }
 

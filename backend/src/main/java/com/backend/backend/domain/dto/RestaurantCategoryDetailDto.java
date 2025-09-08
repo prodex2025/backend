@@ -11,9 +11,10 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RestaurantCategoryDetailDto {
-    private UUID restaurantId;
-    private String restaurantName;
-    private String restaurantAddress;
-    private String restaurantPostCode;
+    private UUID id;
+    private String name;
+    private String address;
+    private String postCode;
+    private String imageUrl;
     private List<RestaurantCategoryDto> categoryDtoList;
 }
