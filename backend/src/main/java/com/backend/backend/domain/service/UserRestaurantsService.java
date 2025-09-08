@@ -71,16 +71,29 @@ public class UserRestaurantsService {
         return RestaurantMapper.toRestaurantDetailHeader(restaurant, restaurantCategoryList);
     }
 
-    //店舗詳細情報取得
+    // 店舗詳細情報取得
     public RestaurantDetailDto getRestaurantProfile(UUID restaurantId){
         Restaurant restaurant = restaurantRepository.findById(restaurantId)
                 .orElseThrow(()->new jakarta.persistence.EntityNotFoundException("店舗を取得できませんでした"));
 
-        //中間テーブルの取得
+        // 中間テーブルの取得
         List<StoreSchedule> storeSchedules = storeScheduleRepository.findByRestaurant(restaurant);
 
-        //DTOに変換したデータを取得して、値を返す
-        return RestaurantMapper.toRestaurantProfileDto(restaurant, storeSchedules);
+        // urlを取得
+        String signedUrl;
+        String key = restaurant.getImageUrl();
+        if (key == null || key.isBlank()) {
+            signedUrl = "NO_IMAGE_URL";
+        } else {
+            try {
+                signedUrl = s3UrlService.generatePresignedUrl(key);
+            } catch (Exception e) {
+                signedUrl = "NO_IMAGE_URL";
+            }
+        }
+
+        // DTOに変換したデータを取得して、値を返す
+        return RestaurantMapper.toRestaurantProfileDto(restaurant, storeSchedules, signedUrl);
     }
 
     private Page<RestaurantCategoryDetailDto> toDtoPage(Page<Restaurant> restaurants) {
