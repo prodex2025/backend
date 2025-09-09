@@ -9,6 +9,8 @@ import com.backend.backend.domain.model.DishAllergy;
 import com.backend.backend.domain.model.Restaurant;
 import com.backend.backend.domain.repository.*;
 import com.backend.backend.domain.service.mapper.DishMapper;
+import com.backend.backend.domain.service.s3.S3Mover;
+import com.backend.backend.domain.service.s3.S3UrlService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,9 +22,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+
+import static org.springframework.util.StringUtils.hasText;
 
 @Service
 public class OwnerDishService {
@@ -31,15 +36,21 @@ public class OwnerDishService {
     private final RestaurantRepository restaurantRepository;
     private final AllergyRepository allergyRepository;
     private final DishAllergyRepository dishAllergyRepository;
+    private final S3Mover s3Mover;
+    private final S3UrlService s3UrlService;
 
     public OwnerDishService(DishRepository dishRepository,
                             RestaurantRepository restaurantRepository,
                             AllergyRepository allergyRepository,
-                            DishAllergyRepository dishAllergyRepository) {
+                            DishAllergyRepository dishAllergyRepository,
+                            S3Mover s3Mover,
+                            S3UrlService s3UrlService) {
         this.dishRepository = dishRepository;
         this.restaurantRepository = restaurantRepository;
         this.allergyRepository = allergyRepository;
         this.dishAllergyRepository = dishAllergyRepository;
+        this.s3Mover = s3Mover;
+        this.s3UrlService = s3UrlService;
     }
 
     private static final int DEFAULT_PAGE_SIZE = 10;
@@ -60,7 +71,26 @@ public class OwnerDishService {
         Pageable pageable = PageRequest.of(page, DEFAULT_PAGE_SIZE, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Dish> dishes = dishRepository.findByRestaurantId(pageable, restaurantId);
 
-        return DishMapper.toDishesListDtoPage(dishes);
+        return dishes.map(dish -> {
+            String signedUrl;
+            String key = dish.getImageUrl();
+            if (key == null || key.isBlank()) {
+                signedUrl = "NO_IMAGE_URL";
+            } else {
+                try {
+                    signedUrl = s3UrlService.generatePresignedUrl(key);
+                } catch (Exception e) {
+                    signedUrl = "NO_IMAGE_URL";
+                }
+            }
+
+            return new DishesListDto(
+                    dish.getId(),
+                    dish.getName(),
+                    dish.getPrice(),
+                    signedUrl
+            );
+        });
     }
 
     // 店舗メニュー登録
@@ -83,6 +113,16 @@ public class OwnerDishService {
         // 料理を登録
         Dish dish = DishMapper.toDishEntity(dto, restaurant);
         dishRepository.save(dish);
+
+        String imageKey = moveToFinal(dto.getImageKey(), "images", dish.getId());
+        String videoKey = moveToFinal(dto.getVideoKey(), "models", dish.getId());
+
+        dish.setImageUrl(imageKey);
+        dish.setVideoUrl(videoKey);
+        restaurantRepository.save(restaurant);
+
+        // tmp削除
+        s3Mover.deleteBatch(List.of(dto.getImageKey(), dto.getVideoKey()));
 
         // アレルギー情報の処理
         List<DishAllergy> dishAllergyList = createDishAllergies(dish, dto.getAllergyDtoList());
@@ -112,14 +152,49 @@ public class OwnerDishService {
         Dish dish = dishRepository.findById(dishId)
                 .orElseThrow(() -> new RuntimeException("料理を取得できませんでした"));
 
+        // 削除対象のS3キーを事前に回収
+        List<String> deleteAfterCommit = new ArrayList<>();
+
+        if (hasText(dto.getImageKey())) {
+            String newKey = moveToFinal(dto.getImageKey(), "images", dish.getId());
+            String oldKey = dish.getImageUrl();
+            dish.setImageUrl(newKey);
+            if (hasText(oldKey)) deleteAfterCommit.add(oldKey);
+            deleteAfterCommit.add(dto.getImageKey());
+        }
+
+        if (hasText(dto.getVideoKey())) {
+            String newKey = moveToFinal(dto.getVideoKey(), "models", dish.getId());
+            String oldKey = dish.getVideoUrl();
+            dish.setVideoUrl(newKey);
+            if (hasText(oldKey)) deleteAfterCommit.add(oldKey);
+            deleteAfterCommit.add(dto.getImageKey());
+        }
         // 料理情報更新
         updateDishInfo(dish, dto);
 
         // アレルギー情報の更新
         updateDishAllergies(dish, dto.getAllergyDtoList());
+
+        // コミット後にS3削除
+        if (!deleteAfterCommit.isEmpty()) {
+            org.springframework.transaction.support.TransactionSynchronizationManager
+                    .registerSynchronization(new org.springframework.transaction.support.TransactionSynchronization() {
+                        @Override public void afterCommit() {
+                            try {
+                                s3Mover.deleteBatch(deleteAfterCommit); // 個別ファイル
+                            } catch (Exception ignored) {}
+                            try {
+                                // restaurants/{restaurantId}/ 以下を全削除
+                                s3Mover.deletePrefix("dishes/" + dishId + "/");
+                            } catch (Exception ignored) {}
+                        }
+                    });
+        }
     }
 
     // メニュー削除
+    @Transactional
     public void deleteDish(UserDetails userDetails, UUID restaurantId, UUID dishId) {
         // loginIdを取得
         String loginId = userDetails.getUsername();
@@ -140,11 +215,33 @@ public class OwnerDishService {
             throw new AccessDeniedException("この料理を削除する権限がありません");
         }
 
-        // 関連するアレルギー情報を削除
-        dishAllergyRepository.deleteByDish(dish);
+        // 削除対象のS3キーを事前に回収
+        List<String> deleteAfterCommit = new ArrayList<>();
+        if (hasText(dish.getImageUrl())) {
+            deleteAfterCommit.add(dish.getImageUrl());
+        }
+
+        if (hasText(dish.getVideoUrl())) {
+            deleteAfterCommit.add(dish.getVideoUrl());
+        }
 
         // 料理削除
         dishRepository.deleteById(dishId);
+
+        // コミット後にS3削除
+        if (!deleteAfterCommit.isEmpty()) {
+            org.springframework.transaction.support.TransactionSynchronizationManager
+                    .registerSynchronization(new org.springframework.transaction.support.TransactionSynchronization() {
+                        @Override public void afterCommit() {
+                            try {
+                                s3Mover.deleteBatch(deleteAfterCommit); // 個別ファイル
+                            } catch (Exception ignored) {}
+                            try {
+                                s3Mover.deletePrefix("dishes/" + dishId + "/");
+                            } catch (Exception ignored) {}
+                        }
+                    });
+        }
     }
 
     // 認証チェック
@@ -206,6 +303,17 @@ public class OwnerDishService {
             if (!newDishAllergyList.isEmpty()) {
                 dishAllergyRepository.saveAll(newDishAllergyList);
             }
+    }
+
+    // 仮保存から本番の保存にコピー
+    private String moveToFinal(String tmpKey, String kind, UUID dishId) {
+        // tmpKey
+        String fileName = tmpKey.substring(tmpKey.lastIndexOf('/') + 1);
+        String destKey  = "dishes/%s/%s/%s".formatted(dishId, kind, fileName);
+
+        s3Mover.copy(tmpKey, destKey);
+
+        return destKey;
     }
 
 }

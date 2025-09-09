@@ -15,20 +15,21 @@ import java.util.UUID;
 
 public class DishMapper {
     // 料理DTO返却
-    public static Page<DishesListDto> toDishesListDtoPage(Page<Dish> dishes) {
-        return dishes.map(dish -> new DishesListDto(
+    public static DishesListDto toDishesListDtoPage(Dish dish, String signedUrl) {
+        return new DishesListDto(
+                // 店舗情報からDTOに変換して返却
                 dish.getId(),
                 dish.getName(),
                 dish.getPrice(),
-                dish.getImageUrl()
-        ));
+                signedUrl
+        );
     }
 
-    public static Dish3dDto toDish3dDto(Dish dish) {
+    public static Dish3dDto toDish3dDto(Dish dish, String signedUrl) {
         Dish3dDto dto = new Dish3dDto();
         dto.setId(dish.getId());
         dto.setName(dish.getName());
-        dto.setVideoUrl(dish.getVideoUrl());
+        dto.setVideoUrl(signedUrl);
         dto.setDescription(dish.getDescription());
 
         dto.setAllergyDtoList(
@@ -47,8 +48,8 @@ public class DishMapper {
         dish.setName(dto.getName());
         dish.setPrice(dto.getPrice());
         dish.setDescription(dto.getDescription());
-        dish.setImageUrl(dto.getImageUrl());
-        dish.setVideoUrl(dto.getVideoUrl());
+        dish.setImageUrl("PENDING");
+        dish.setVideoUrl("PENDING");
 
         return dish;
     }
@@ -67,9 +68,6 @@ public class DishMapper {
         dish.setName(dto.getName());
         dish.setPrice(dto.getPrice());
         dish.setDescription(dto.getDescription());
-        dish.setImageUrl(dto.getImageUrl());
-        dish.setVideoUrl(dto.getVideoUrl());
-
         return dish;
     }
 }

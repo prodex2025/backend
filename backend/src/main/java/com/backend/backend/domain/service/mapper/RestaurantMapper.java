@@ -16,13 +16,15 @@ public class RestaurantMapper {
         restaurant.setAddress(dto.getAddress());
         restaurant.setPostCode(dto.getPostCode());
         restaurant.setPhone(dto.getPhone());
-        restaurant.setEmail("example@example.com");
+        restaurant.setEmail(dto.getEmail());
+        // 仮キーをセット
+        restaurant.setImageUrl("PENDING");
+        restaurant.setInteriorImageUrl("PENDING");
         restaurant.setDescription(dto.getDescription());
-        restaurant.setImageUrl(dto.getImageUrl());
-        restaurant.setInteriorImageUrl(dto.getInteriorImageUrl());
         restaurant.setCertificate(dto.getCertificate());
-        restaurant.setApproved(false);
-        restaurant.setIsPublished(false);
+        // 仮でtrueセット
+        restaurant.setApproved(true);
+        restaurant.setIsPublished(true);
         return restaurant;
     }
 
@@ -50,10 +52,10 @@ public class RestaurantMapper {
     public static RestaurantCategoryDetailDto toRestaurantDetailHeader(Restaurant restaurant, List<RestaurantCategory> restaurantCategory) {
        // DTOにセット
         RestaurantCategoryDetailDto restaurantCategoryDetailDto = new RestaurantCategoryDetailDto();
-        restaurantCategoryDetailDto.setRestaurantId(restaurant.getId());
-        restaurantCategoryDetailDto.setRestaurantName(restaurant.getName());
-        restaurantCategoryDetailDto.setRestaurantAddress(restaurant.getAddress());
-        restaurantCategoryDetailDto.setRestaurantPostCode(restaurant.getPostCode());
+        restaurantCategoryDetailDto.setId(restaurant.getId());
+        restaurantCategoryDetailDto.setName(restaurant.getName());
+        restaurantCategoryDetailDto.setAddress(restaurant.getAddress());
+        restaurantCategoryDetailDto.setPostCode(restaurant.getPostCode());
         restaurantCategoryDetailDto.setCategoryDtoList(restaurantCategory.stream().map(RestaurantCategoryDto::fromEntity).toList());
 
         return restaurantCategoryDetailDto;
@@ -65,7 +67,6 @@ public class RestaurantMapper {
         restaurant.setName(editRestaurant.getRestaurantName());
         restaurant.setAddress(editRestaurant.getRestaurantAddress());
         restaurant.setPostCode(editRestaurant.getRestaurantPostCode());
-        restaurant.setImageUrl(editRestaurant.getImageUrl());
 
         return restaurant;
     }
@@ -80,7 +81,7 @@ public class RestaurantMapper {
     }
 
     // 店舗詳細情報DTOセット
-    public static RestaurantDetailDto toRestaurantDetailDto(Restaurant restaurant, List<StoreSchedule> storeSchedules) {
+    public static RestaurantDetailDto toRestaurantDetailDto(Restaurant restaurant, String signedUrl, List<StoreSchedule> storeSchedules) {
         //DTOセット
         RestaurantDetailDto restaurantDetailDto = new RestaurantDetailDto();
         restaurantDetailDto.setId(restaurant.getId());
@@ -88,14 +89,14 @@ public class RestaurantMapper {
         restaurantDetailDto.setPhone(restaurant.getPhone());
         restaurantDetailDto.setEmail(restaurant.getEmail());
         restaurantDetailDto.setDescription(restaurant.getDescription());
-        restaurantDetailDto.setInteriorImageUrl(restaurant.getInteriorImageUrl());
+        restaurantDetailDto.setInteriorImageUrl(signedUrl);
         restaurantDetailDto.setStoreScheduleDtoList(storeSchedules.stream().map(StoreScheduleDto::fromEntity).toList());
 
         return restaurantDetailDto;
     }
 
     // 店舗一覧DTO返却
-    public static RestaurantCategoryDetailDto toRestaurantCategoryDetailDto(List<RestaurantCategory> categories, Restaurant restaurant) {
+    public static RestaurantCategoryDetailDto toRestaurantCategoryDetailDto(List<RestaurantCategory> categories, Restaurant restaurant, String signedUrl) {
         // カテゴリEntityをDTOに変換
         List<RestaurantCategoryDto> categoryList = categories.stream()
                 .map(RestaurantCategoryDto::fromEntity)
@@ -107,12 +108,13 @@ public class RestaurantMapper {
                 restaurant.getName(),
                 restaurant.getAddress(),
                 restaurant.getPostCode(),
+                signedUrl,
                 categoryList
         );
     }
 
     //店舗情報
-    public static RestaurantDetailDto toRestaurantProfileDto(Restaurant restaurant, List<StoreSchedule> storeSchedules){
+    public static RestaurantDetailDto toRestaurantProfileDto(Restaurant restaurant, List<StoreSchedule> storeSchedules, String signedUrl){
         // StoreScheduleエンティティをDTOに変換
         List<StoreScheduleDto> scheduleList = storeSchedules.stream()
                 .map(StoreScheduleDto::fromEntity)
@@ -120,13 +122,13 @@ public class RestaurantMapper {
 
         // 店舗情報と営業スケジュールをDTOにまとめる
         return new RestaurantDetailDto(
-            restaurant.getId(),
-            restaurant.getAddress(),
-            restaurant.getPhone(),
-            restaurant.getEmail(),
-            restaurant.getDescription(),
-            restaurant.getInteriorImageUrl(),
-            scheduleList
+                restaurant.getId(),
+                restaurant.getAddress(),
+                restaurant.getPhone(),
+                restaurant.getEmail(),
+                restaurant.getDescription(),
+                signedUrl,
+                scheduleList
         );
     }
 

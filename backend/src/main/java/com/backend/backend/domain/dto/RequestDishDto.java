@@ -14,8 +14,8 @@ public class RequestDishDto {
     private UUID id;
     private String name;
     private Integer price;
-    private String imageUrl;
-    private String videoUrl;
+    private String imageKey;
+    private String videoKey;
     private String description;
     private List<AllergyDto> allergyDtoList;
 }
