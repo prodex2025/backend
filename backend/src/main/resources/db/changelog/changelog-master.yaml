@@ -1,43 +1,43 @@
 databaseChangeLog:
   - include:
-      file: db/changeLog/V1__users_create_table.yaml
+      file: db/changelog/V1__users_create_table.yaml
   - include:
-      file: db/changeLog/V1.1__users_add_column.yaml
+      file: db/changelog/V1.1__users_add_column.yaml
   - include:
-      file: db/changeLog/V1.2__refresh_token_create_table.yaml
+      file: db/changelog/V1.2__refresh_token_create_table.yaml
   - include:
-      file: db/changeLog/V1.3__restaurants_create_table.yaml
+      file: db/changelog/V1.3__restaurants_create_table.yaml
   - include:
-      file: db/changeLog/V1.4__dishes_create_table.yaml
+      file: db/changelog/V1.4__dishes_create_table.yaml
   - include:
-      file: db/changeLog/V1.5__restaurants_closed_days_create_table.yaml
+      file: db/changelog/V1.5__restaurants_closed_days_create_table.yaml
   - include:
-      file: db/changeLog/V1.6__restaurants_business_hours_create_table.yaml
+      file: db/changelog/V1.6__restaurants_business_hours_create_table.yaml
   - include:
-      file: db/changeLog/V1.7__categories_create_table.yaml
+      file: db/changelog/V1.7__categories_create_table.yaml
   - include:
-      file: db/changeLog/V1.8__restaurants_categories_create_table.yaml
+      file: db/changelog/V1.8__restaurants_categories_create_table.yaml
   - include:
-      file: db/changeLog/V1.9__restaurants_add_column.yaml
+      file: db/changelog/V1.9__restaurants_add_column.yaml
   - include:
-      file: db/changeLog/V2.0__restaurant_interior_images_create_table.yaml
+      file: db/changelog/V2.0__restaurant_interior_images_create_table.yaml
   - include:
-      file: db/changeLog/V2.1__add_foreign_keys.yaml
+      file: db/changelog/V2.1__add_foreign_keys.yaml
   - include:
-      file: db/changeLog/V2.4__restaurants_add_column.yaml
+      file: db/changelog/V2.4__restaurants_add_column.yaml
   - include:
-      file: db/changeLog/V2.7__allergies_create_table.yaml
+      file: db/changelog/V2.7__allergies_create_table.yaml
   - include:
-      file: db/changeLog/V2.8__dishes_allergies_create_table.yaml
+      file: db/changelog/V2.8__dishes_allergies_create_table.yaml
   - include:
-      file: db/changeLog/V3.6__drop_restaurant_interior_images_table.yaml
+      file: db/changelog/V3.6__drop_restaurant_interior_images_table.yaml
   - include:
-      file: db/changeLog/V3.7__restaurants_add_column.yaml
+      file: db/changelog/V3.7__restaurants_add_column.yaml
   - include:
-      file: db/changeLog/V3.8__restaurants_add_column.yaml
+      file: db/changelog/V3.8__restaurants_add_column.yaml
   - include:
-      file: db/changeLog/V3.9__restaurants_add_column.yaml
+      file: db/changelog/V3.9__restaurants_add_column.yaml
   - include:
-      file: db/changeLog/V4.0__add_on_delete_cascade.yaml
+      file: db/changelog/V4.0__add_on_delete_cascade.yaml
   - include:
-      file: db/changeLog/V4.1__store_schedule.yaml
+      file: db/changelog/V4.1__store_schedule.yaml
