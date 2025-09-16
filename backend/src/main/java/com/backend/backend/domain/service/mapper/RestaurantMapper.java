@@ -49,13 +49,14 @@ public class RestaurantMapper {
     }
 
     // 店舗詳細ヘッダーDTOセット
-    public static RestaurantCategoryDetailDto toRestaurantDetailHeader(Restaurant restaurant, List<RestaurantCategory> restaurantCategory) {
+    public static RestaurantCategoryDetailDto toRestaurantDetailHeader(Restaurant restaurant, List<RestaurantCategory> restaurantCategory, String signedUrl) {
        // DTOにセット
         RestaurantCategoryDetailDto restaurantCategoryDetailDto = new RestaurantCategoryDetailDto();
         restaurantCategoryDetailDto.setId(restaurant.getId());
         restaurantCategoryDetailDto.setName(restaurant.getName());
         restaurantCategoryDetailDto.setAddress(restaurant.getAddress());
         restaurantCategoryDetailDto.setPostCode(restaurant.getPostCode());
+        restaurantCategoryDetailDto.setImageUrl(signedUrl);
         restaurantCategoryDetailDto.setCategoryDtoList(restaurantCategory.stream().map(RestaurantCategoryDto::fromEntity).toList());
 
         return restaurantCategoryDetailDto;
