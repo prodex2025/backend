@@ -64,11 +64,23 @@ public class UserRestaurantsService {
         Restaurant restaurant = restaurantRepository.findById(restaurantId)
                 .orElseThrow(()->new RuntimeException("店舗を取得できませんでした"));
 
+        String imageUrl;
+        String key = restaurant.getImageUrl();
+        if (key == null || key.isBlank()) {
+            imageUrl = "NO_IMAGE_URL";
+        } else {
+            try {
+                imageUrl = s3UrlService.generatePresignedUrl(key);
+            } catch (Exception e) {
+                imageUrl = "NO_IMAGE_URL";
+            }
+        }
+
         //中間テーブルの取得
         List<RestaurantCategory> restaurantCategoryList = restaurantCategoryRepository.findByRestaurantId(restaurantId);
 
         //DTOに変換したデータを取得して、値を返す
-        return RestaurantMapper.toRestaurantDetailHeader(restaurant, restaurantCategoryList);
+        return RestaurantMapper.toRestaurantDetailHeader(restaurant, restaurantCategoryList, imageUrl);
     }
 
     // 店舗詳細情報取得

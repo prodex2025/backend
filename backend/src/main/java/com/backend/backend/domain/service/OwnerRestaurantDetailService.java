@@ -56,16 +56,16 @@ public class OwnerRestaurantDetailService {
         if (loginId == null || !loginId.equals(restaurant.getUser().getLoginId())) {
             throw new AccessDeniedException("この店舗にアクセスする権限がありません");
         }
-    
-        String signedUrl;
+
+        String imageUrl;
         String key = restaurant.getImageUrl();
         if (key == null || key.isBlank()) {
-            signedUrl = "NO_IMAGE_URL";
+            imageUrl = "NO_IMAGE_URL";
         } else {
             try {
-                signedUrl = s3UrlService.generatePresignedUrl(key);
+                imageUrl = s3UrlService.generatePresignedUrl(key);
             } catch (Exception e) {
-                signedUrl = "NO_IMAGE_URL";
+                imageUrl = "NO_IMAGE_URL";
             }
         }
 
@@ -73,7 +73,7 @@ public class OwnerRestaurantDetailService {
         List<RestaurantCategory> restaurantCategoryList = restaurantCategoryRepository.findByRestaurantId(restaurantId);
 
         //DTOに変換したデータを取得して、値を返す
-        return RestaurantMapper.toRestaurantDetailHeader(restaurant, restaurantCategoryList, signedUrl);
+        return RestaurantMapper.toRestaurantDetailHeader(restaurant, restaurantCategoryList, imageUrl);
     }
 
     //店舗詳細のヘッダー部分を編集
